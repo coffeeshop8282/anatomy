@@ -1,0 +1,2970 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedTerm Study</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f0e8;
+  --surface: #ede8dc;
+  --surface2: #e4ddd0;
+  --surface3: #d8d0c0;
+  --border: #c8bfaa;
+  --border2: #b0a690;
+  --accent: #7c5c2e;
+  --accent2: #c0392b;
+  --accent3: #2e7c6e;
+  --accent4: #8c6d2e;
+  --text: #2a2218;
+  --text-muted: #6a5c48;
+  --text-dim: #9a8c78;
+  --green: #2e7c5c;
+  --red: #c0392b;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+  font-size: 15.4px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* ── LANGUAGE BAR ── */
+.lang-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+.lang-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-right: 4px;
+  font-family: 'Space Mono', monospace;
+  letter-spacing: 0.05em;
+}
+.lang-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.05em;
+}
+.lang-btn:hover { border-color: var(--accent); color: var(--text); }
+.lang-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── HEADER ── */
+header {
+  padding: 20px 20px 0;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+.header-inner {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.app-title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(22px, 4vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.app-title span { color: var(--accent); }
+.app-subtitle {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 3px;
+  font-weight: 300;
+}
+.header-stats {
+  margin-left: auto;
+  display: flex;
+  gap: 16px;
+}
+.hstat { text-align: right; }
+.hstat-num {
+  font-family: 'Space Mono', monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.hstat-lbl { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+/* ── CHAPTER TABS ── */
+.chapter-tabs {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-top: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.chapter-tabs::-webkit-scrollbar { display: none; }
+.chapter-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+.chapter-tab:hover { color: var(--text); }
+.chapter-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── PANELS ── */
+.panels { max-width: 1100px; margin: 0 auto; padding: 20px; }
+.chapter-panel { display: none; }
+.chapter-panel.visible { display: block; }
+
+/* ── TERMS PANEL: CONTROLS ── */
+.controls-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-box {
+  flex: 1;
+  min-width: 180px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--text-dim); }
+.filter-btn, .ch-filter-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-btn:hover, .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ch-filter-btn:hover, .ch-filter-btn.active { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+
+/* ── MODE BAR ── */
+.mode-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.mode-label { font-size: 11px; color: var(--text-dim); font-family: 'Space Mono', monospace; margin-right: 2px; }
+.mode-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.mode-btn:hover { color: var(--text); border-color: var(--border2); }
+.mode-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.autoplay-btn {
+  background: var(--accent4);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-left: auto;
+  letter-spacing: 0.02em;
+}
+.autoplay-btn:hover { opacity: 0.85; }
+.autoplay-btn.playing { background: var(--red); }
+
+.autoplay-bar {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.autoplay-bar.visible { display: flex; }
+.autoplay-current { flex: 1; color: var(--text); }
+.autoplay-current .ap-ko { font-size: 15px; font-weight: 700; color: var(--accent); }
+.autoplay-current .ap-en { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.autoplay-progress { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--text-dim); }
+.autoplay-stop {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.autoplay-stop:hover { border-color: var(--red); color: var(--red); }
+
+.panel-autoplay-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.autoplay-options-row {
+  display: none;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.autoplay-options-row.visible { display: flex; }
+.ap-opt-label { font-size: 11px; color: var(--text-dim); font-family: "Space Mono", monospace; margin-right: 4px; }
+.ap-opt-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 11px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.ap-opt-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.ap-label { font-size: 10px; color: var(--text-dim); font-family: "Space Mono", monospace; margin-bottom: 2px; letter-spacing: 0.04em; }
+
+/* ── LIST VIEW ── */
+.list-view { display: none; }
+.list-view.visible { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+.term-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  transition: border-color 0.15s, transform 0.12s;
+  animation: fadeUp 0.25s ease both;
+}
+.term-card:hover { border-color: var(--border2); transform: translateY(-1px); }
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+.card-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.type-tag {
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  padding: 2px 7px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.tag-combining { background: rgba(124,92,46,0.15); color: #7c5c2e; border: 1px solid rgba(124,92,46,0.35); }
+.tag-suffix    { background: rgba(192,57,43,0.12); color: #a02820; border: 1px solid rgba(192,57,43,0.3); }
+.tag-prefix    { background: rgba(46,124,110,0.12);  color: #2e7c6e; border: 1px solid rgba(46,124,110,0.3); }
+.card-term { font-size: 18px; font-weight: 700; color: var(--text); font-family: 'Space Mono', monospace; }
+.card-pronun { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.card-meaning { font-size: 13px; color: var(--text); margin-bottom: 6px; line-height: 1.4; }
+.card-examples { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+.example-row {
+  background: var(--surface2);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ex-term { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent3); font-weight: 700; min-width: 80px; }
+.ex-meaning { font-size: 12px; color: var(--text-muted); }
+.speak-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 13px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.speak-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── FLASHCARD ── */
+.flashcard-view { display: none; }
+.flashcard-view.visible { display: block; }
+.fc-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.fc-progress { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--text-muted); }
+.fc-progress-bar { flex: 1; height: 3px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+.fc-progress-fill { height: 100%; background: var(--accent); transition: width 0.3s; border-radius: 2px; }
+.fc-shuffle-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.fc-shuffle-btn:hover { border-color: var(--accent); color: var(--accent); }
+.flashcard-stage {
+  perspective: 1200px;
+  height: 340px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.flashcard-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.flashcard-inner.flipped { transform: rotateY(180deg); }
+.fc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+}
+.fc-front { background: var(--surface); }
+.fc-back { background: var(--surface2); transform: rotateY(180deg); }
+.fc-type-tag { font-size: 11px; font-family: 'Space Mono', monospace; margin-bottom: 16px; padding: 4px 12px; border-radius: 12px; }
+.fc-main-term { font-family: 'Space Mono', monospace; font-size: clamp(32px, 6vw, 52px); font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1; }
+.fc-hint { font-size: 12px; color: var(--text-dim); }
+.fc-answer-meaning { font-size: 22px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+.fc-answer-pronun { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+.fc-examples { display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto; width: 100%; }
+.fc-ex-item { background: var(--surface); border-radius: 8px; padding: 6px 12px; text-align: left; }
+.fc-ex-en { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--accent3); }
+.fc-ex-ko { font-size: 11px; color: var(--text-muted); }
+.fc-speak-area { margin-top: 16px; }
+.fc-speak-big {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.fc-speak-big:hover { opacity: 0.85; }
+.fc-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+.fc-nav-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 18px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.fc-nav-btn:hover { background: var(--accent); border-color: var(--accent); }
+.fc-flip-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.fc-flip-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── QUIZ ── */
+.quiz-view { display: none; }
+.quiz-view.visible { display: block; }
+.quiz-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.quiz-question-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+.quiz-q-label { font-size: 11px; color: var(--text-dim); font-family: 'Space Mono', monospace; margin-bottom: 12px; }
+.quiz-q-term { font-family: 'Space Mono', monospace; font-size: clamp(24px, 5vw, 38px); font-weight: 700; color: var(--text); }
+.quiz-q-type { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
+.quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.quiz-option {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.12s;
+  line-height: 1.4;
+}
+.quiz-option:hover:not(:disabled) { border-color: var(--accent); background: rgba(108,92,231,0.08); }
+.quiz-option.correct { background: rgba(46,124,92,0.12); border-color: var(--green); color: var(--green); }
+.quiz-option.wrong { background: rgba(192,57,43,0.12); border-color: var(--red); color: var(--red); }
+.quiz-feedback { min-height: 30px; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: center; }
+.quiz-next-btn {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: opacity 0.15s;
+  opacity: 0;
+  pointer-events: none;
+}
+.quiz-next-btn.show { opacity: 1; pointer-events: all; }
+
+/* ── ANATOMY FIGURES ── */
+.figures-view { display: none; }
+.figures-view.visible { display: block; }
+.fig-cards-wrap { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 20px; }
+.fig-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.fig-card:hover { border-color: var(--border2); }
+.fig-chapter-group { margin-bottom: 32px; }
+.fig-chapter-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--border);
+}
+.fig-ch-badge {
+  background: var(--accent);
+  color: #fff;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+.fig-ch-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.fig-chapter-badge {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 5px 12px;
+  letter-spacing: 0.03em;
+}
+
+.fig-diagram {
+  width: 100%;
+  background: #2a2218;
+  border-bottom: 1px solid var(--border);
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.fig-svg { width: 100%; height: auto; max-height: 340px; }
+.fig-info { padding: 14px 16px; }
+.fig-title { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.fig-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── PHOTO CARDS TAB ── */
+.photos-panel {}
+.photos-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.photos-toolbar h3 { font-size: 13px; color: var(--text-muted); font-weight: 400; margin-right: auto; }
+.upload-btn-label {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.upload-btn-label:hover { opacity: 0.85; }
+#photoFileInput { display: none; }
+.photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.photo-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  animation: fadeUp 0.25s ease both;
+  transition: border-color 0.15s;
+}
+.photo-card:hover { border-color: var(--border2); }
+.photo-card-img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: contain;
+  display: block;
+  background: var(--surface2);
+  cursor: zoom-in;
+}
+.photo-card-body { padding: 12px 14px; }
+.photo-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  outline: none;
+  background: none;
+  border: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  cursor: text;
+}
+.photo-card-title[contenteditable]:focus {
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin: -2px -6px;
+}
+.photo-card-notes {
+  font-size: 12px;
+  color: var(--text-muted);
+  outline: none;
+  background: none;
+  border: none;
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  line-height: 1.5;
+  cursor: text;
+  min-height: 36px;
+  resize: none;
+}
+.photo-card-notes[contenteditable]:focus {
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 4px 6px;
+}
+.photo-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 14px 10px;
+  gap: 6px;
+}
+.photo-delete-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Space Mono', monospace;
+  transition: all 0.12s;
+}
+.photo-delete-btn:hover { border-color: var(--red); color: var(--red); }
+.photo-empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-dim);
+}
+.photo-empty .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.4; }
+.photo-empty p { font-size: 13px; line-height: 1.6; }
+
+/* ── SPECIALIST PANEL ── */
+.specialist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px; }
+.specialist-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  animation: fadeUp 0.25s ease both;
+}
+.spec-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px; }
+.spec-tag {
+  font-size: 10px;
+  font-family: 'Space Mono', monospace;
+  padding: 3px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  margin-top: 3px;
+}
+.spec-tag-medical   { background: rgba(108,92,231,0.15); color: #a29bfe; border: 1px solid rgba(108,92,231,0.3); }
+.spec-tag-surgical  { background: rgba(0,206,201,0.12); color: #00cec9; border: 1px solid rgba(0,206,201,0.3); }
+.spec-tag-diagnostic{ background: rgba(253,203,110,0.12); color: #fdcb6e; border: 1px solid rgba(253,203,110,0.3); }
+.spec-title { font-size: 16px; font-weight: 700; font-family: 'Space Mono', monospace; color: var(--text); }
+.spec-ko { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.spec-pronun { font-size: 11px; color: var(--text-dim); }
+.spec-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; line-height: 1.5; }
+.spec-treats { display: flex; flex-wrap: wrap; gap: 5px; }
+.spec-treat-tag {
+  font-size: 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 3px 9px;
+  border-radius: 10px;
+}
+
+/* ── WARD PANEL ── */
+.ward-section { margin-bottom: 24px; }
+.ward-section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.ward-section-icon { font-size: 18px; }
+.ward-section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.ward-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.ward-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  animation: fadeUp 0.2s ease both;
+}
+.ward-abbr { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--accent4); margin-bottom: 4px; }
+.ward-en { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.ward-ko { font-size: 12px; color: var(--accent3); margin-bottom: 4px; }
+.ward-es { font-size: 12px; color: var(--accent2); margin-bottom: 4px; display: none; }
+.ward-desc { font-size: 11px; color: var(--text-dim); line-height: 1.4; }
+
+/* ── DROP ZONE ── */
+.photo-drop-zone {
+  border: 2px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  margin-bottom: 16px;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.photo-drop-zone.drag-over {
+  border-color: var(--accent);
+  background: rgba(108,92,231,0.08);
+}
+.drop-inner {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+/* ── SCROLLBAR ── */
+/* ── MUST KNOW ── */
+.mk-category {
+  border: 1px solid;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.mk-cat-title {
+  font-family: 'Space Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
+.mk-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+.mk-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: border-color 0.12s;
+}
+.mk-card:hover { border-color: var(--border2); }
+.mk-term {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+.mk-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+.mk-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* ── PHOTO MODAL ── */
+.photo-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.15s ease;
+}
+@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+.photo-modal-inner {
+  position: relative;
+  max-width: 95vw;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.photo-modal-img {
+  max-width: 95vw;
+  max-height: 82vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+.photo-modal-title {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  max-width: 80vw;
+}
+.photo-modal-close {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+.photo-modal-close:hover { background: rgba(255,255,255,0.3); }
+.photo-card-img {
+  cursor: zoom-in;
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- LANGUAGE BAR -->
+<div class="lang-bar">
+  <span class="lang-label">LANG</span>
+  <button class="lang-btn active" data-lang="ko">한국어</button>
+  <button class="lang-btn" data-lang="en">English</button>
+  <button class="lang-btn" data-lang="es">Español</button>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="app-title">MED<span>TERM</span></div>
+      <div class="app-subtitle" id="appSubtitle">의학 용어 학습 앱 · BCIT Healthcare Unit Clerk</div>
+    </div>
+    <div class="header-stats">
+      <div class="hstat">
+        <div class="hstat-num" id="statTerms">0</div>
+        <div class="hstat-lbl" id="statTermsLbl">용어</div>
+      </div>
+      <div class="hstat">
+        <div class="hstat-num" id="statPhotos">0</div>
+        <div class="hstat-lbl" id="statPhotosLbl">사진</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- CHAPTER TABS -->
+<div class="chapter-tabs">
+  <button class="chapter-tab active" data-chapter="terms" id="tabTerms">📚 용어</button>
+  <button class="chapter-tab" data-chapter="specialist" id="tabSpecialist">🩺 스페셜리스트</button>
+  <button class="chapter-tab" data-chapter="ward" id="tabWard">🏥 병동</button>
+  <button class="chapter-tab" data-chapter="figures" id="tabFigures">🔬 해부도</button>
+  <button class="chapter-tab" data-chapter="photos" id="tabPhotos">📸 사진 카드</button>
+  <button class="chapter-tab" data-chapter="mustknow" id="tabMustKnow">⭐ 필수 암기</button>
+</div>
+
+<div class="panels">
+
+  <!-- ═══ TERMS PANEL ═══ -->
+  <div class="chapter-panel visible" id="panelTerms">
+    <div class="controls-row">
+      <input class="search-box" type="text" id="searchBox" placeholder="검색...">
+      <button class="filter-btn active" data-filter="all" id="filterAll">전체</button>
+      <button class="filter-btn" data-filter="combining" id="filterCombining">결합형</button>
+      <button class="filter-btn" data-filter="suffix" id="filterSuffix">접미사</button>
+      <button class="filter-btn" data-filter="prefix" id="filterPrefix">접두사</button>
+    </div>
+    <div class="controls-row" style="margin-top:-8px">
+      <span style="font-size:11px;color:var(--text-dim);font-family:'Space Mono',monospace;">CH</span>
+      <button class="ch-filter-btn active" data-chfilter="all" id="chAll">전체</button>
+      <button class="ch-filter-btn" data-chfilter="1" id="ch1">Ch.1</button>
+      <button class="ch-filter-btn" data-chfilter="2" id="ch2">Ch.2</button>
+    </div>
+    <div class="mode-bar">
+      <span class="mode-label">MODE</span>
+      <button class="mode-btn active" data-mode="list" id="modeList">목록</button>
+      <button class="mode-btn" data-mode="flashcard" id="modeFlashcard">플래시카드</button>
+      <button class="mode-btn" data-mode="quiz" id="modeQuiz">퀴즈</button>
+      <button class="autoplay-btn" id="autoPlayBtn" title="한국어→영어 자동 읽기">▶ 자동 읽기</button>
+    </div>
+
+    <div class="autoplay-options-row" id="autoPlayOptionsRow">
+      <span class="ap-opt-label">자동 읽기 옵션</span>
+      <button class="ap-opt-btn active" id="apOptExamples" title="예시 단어도 읽기">예시 포함</button>
+      <button class="ap-opt-btn" id="apOptShuffle" title="섞어서 읽기">셔플</button>
+    </div>
+    <div class="autoplay-bar" id="autoPlayBar">
+      <div class="autoplay-current">
+        <div class="ap-label" id="apLabel">단어</div>
+        <div class="ap-ko" id="apKo">–</div>
+        <div class="ap-en" id="apEn">–</div>
+      </div>
+      <span class="autoplay-progress" id="apProgress">0/0</span>
+      <button class="autoplay-stop" id="autoPlayStop">■ 정지</button>
+    </div>
+
+    <!-- LIST -->
+    <div class="list-view visible" id="listView"></div>
+
+    <!-- FLASHCARD -->
+    <div class="flashcard-view" id="flashcardView">
+      <div class="fc-controls">
+        <span class="fc-progress" id="fcProgress">1 / 0</span>
+        <div class="fc-progress-bar"><div class="fc-progress-fill" id="fcProgressFill"></div></div>
+        <button class="fc-shuffle-btn" id="fcShuffle">⇄ 섞기</button>
+      </div>
+      <div class="flashcard-stage" id="flashcardStage">
+        <div class="flashcard-inner" id="flashcardInner">
+          <div class="fc-face fc-front">
+            <span class="fc-type-tag tag-combining" id="fcTypeTag">결합형</span>
+            <div class="fc-main-term" id="fcTerm">–</div>
+            <div class="fc-hint" id="fcHint">클릭해서 뒤집기</div>
+          </div>
+          <div class="fc-face fc-back">
+            <span class="fc-type-tag tag-combining" id="fcTypeTagBack">결합형</span>
+            <div class="fc-answer-meaning" id="fcMeaning">–</div>
+            <div class="fc-answer-pronun" id="fcPronun"></div>
+            <div class="fc-examples" id="fcExamples"></div>
+            <div class="fc-speak-area">
+              <button class="fc-speak-big" id="fcSpeakBtn">🔊 발음 듣기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fc-nav">
+        <button class="fc-nav-btn" id="fcPrev">←</button>
+        <button class="fc-flip-btn" id="fcFlip">↩ 뒤집기</button>
+        <button class="fc-nav-btn" id="fcNext">→</button>
+      </div>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="quiz-view" id="quizView">
+      <div class="quiz-score-bar">
+        <span id="quizScore">✅ 0</span>/<span id="quizTotal">0</span>
+        <span style="margin-left:auto;font-size:12px;" id="quizPercent">–</span>
+      </div>
+      <div class="quiz-question-card">
+        <div class="quiz-q-label" id="quizQLabel">다음 의학 용어의 의미는?</div>
+        <div class="quiz-q-term" id="quizTerm">–</div>
+        <div class="quiz-q-type" id="quizType"></div>
+      </div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" id="quizNextLbl">다음 문제 →</button>
+    </div>
+  </div>
+
+  <!-- ═══ SPECIALIST PANEL ═══ -->
+  <div class="chapter-panel" id="panelSpecialist">
+    <div class="panel-autoplay-row">
+      <button class="autoplay-btn" id="specAutoPlayBtn">▶ 자동 읽기</button>
+      <button class="ap-opt-btn active" id="specApOptShuffle" style="margin-left:6px">셔플 꺼짐</button>
+    </div>
+    <div class="autoplay-bar" id="specAutoPlayBar">
+      <div class="autoplay-current">
+        <div class="ap-label" id="specApLabel">스페셜리스트</div>
+        <div class="ap-ko" id="specApKo">–</div>
+        <div class="ap-en" id="specApEn">–</div>
+      </div>
+      <span class="autoplay-progress" id="specApProgress">0/0</span>
+      <button class="autoplay-stop" id="specAutoPlayStop">■ 정지</button>
+    </div>
+    <div class="specialist-grid" id="specialistGrid"></div>
+  </div>
+
+  <!-- ═══ WARD PANEL ═══ -->
+  <div class="chapter-panel" id="panelWard">
+    <div class="panel-autoplay-row">
+      <button class="autoplay-btn" id="wardAutoPlayBtn">▶ 자동 읽기</button>
+      <button class="ap-opt-btn" id="wardApOptShuffle" style="margin-left:6px">셔플 꺼짐</button>
+    </div>
+    <div class="autoplay-bar" id="wardAutoPlayBar">
+      <div class="autoplay-current">
+        <div class="ap-label" id="wardApLabel">병동</div>
+        <div class="ap-ko" id="wardApKo">–</div>
+        <div class="ap-en" id="wardApEn">–</div>
+      </div>
+      <span class="autoplay-progress" id="wardApProgress">0/0</span>
+      <button class="autoplay-stop" id="wardAutoPlayStop">■ 정지</button>
+    </div>
+    <div id="wardContent"></div>
+  </div>
+
+  <!-- ═══ FIGURES PANEL ═══ -->
+  <div class="chapter-panel" id="panelFigures">
+    <div class="figures-view visible" id="figuresView">
+      <div class="fig-cards-wrap" id="figCardsWrap"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PHOTOS PANEL ═══ -->
+  <div class="chapter-panel" id="panelPhotos">
+    <div class="photos-toolbar">
+      <h3 id="photosTitle">교재 이미지나 노트 사진을 카드로 저장하세요</h3>
+      <label class="upload-btn-label" for="photoFileInput">
+        <span id="addPhotoLabel">＋ 사진 추가</span>
+      </label>
+      <input type="file" id="photoFileInput" accept="image/*" multiple>
+    </div>
+    <div id="photoDropZone" class="photo-drop-zone">
+      <div class="drop-inner" id="dropInner">📂 여기에 사진을 드래그하거나 위 버튼을 눌러 여러 장 업로드</div>
+    </div>
+    <div class="photo-grid" id="photoGrid"></div>
+  </div>
+
+  <!-- ═══ MUST KNOW PANEL ═══ -->
+  <!-- MUST KNOW PANEL -->
+  <div class="chapter-panel" id="panelMustknow">
+    <div class="panel-autoplay-row" style="margin-bottom:14px">
+      <button class="autoplay-btn" id="mkAutoPlayBtn">&#9654; 자동 읽기</button>
+      <button class="ap-opt-btn active" id="mkApOptHint">힌트 포함</button>
+      <button class="ap-opt-btn" id="mkApOptShuffle">셔플 꺼짐</button>
+    </div>
+    <div class="autoplay-bar" id="mkAutoPlayBar">
+      <div class="autoplay-current">
+        <div class="ap-label" id="mkApLabel">필수암기</div>
+        <div class="ap-ko" id="mkApKo">-</div>
+        <div class="ap-en" id="mkApEn">-</div>
+      </div>
+      <span class="autoplay-progress" id="mkApProgress">0/0</span>
+      <button class="autoplay-stop" id="mkAutoPlayStop">&#9632; 정지</button>
+    </div>
+    <div id="mustKnowContent"></div>
+  </div>
+
+</div><!-- /panels -->
+
+<script>
+// ============================================================
+// LANGUAGE SYSTEM
+// ============================================================
+let LANG = 'ko';
+
+const T = {
+  ko: {
+    subtitle: '의학 용어 학습 앱 · BCIT Healthcare Unit Clerk',
+    terms: '용어', specialist: '스페셜리스트', ward: '병동', figures: '해부도', photos: '사진 카드',
+    statTerms: '용어', statPhotos: '사진',
+    searchPH: '검색...',
+    all: '전체', combining: '결합형', suffix: '접미사', prefix: '접두사',
+    mode_list: '목록', mode_fc: '플래시카드', mode_quiz: '퀴즈',
+    shuffle: '⇄ 섞기',
+    flipHint: '클릭해서 뒤집기',
+    flip: '↩ 뒤집기',
+    speak: '🔊 발음 듣기',
+    quizQ: '다음 의학 용어의 의미는?',
+    quizNext: '다음 문제 →',
+    photosTitle: '교재 이미지나 노트 사진을 카드로 저장하세요',
+    addPhoto: '＋ 사진 추가',
+    deleteCard: '삭제',
+    photoTitlePH: '제목 (클릭해서 편집)',
+    photoNotesPH: '노트 (클릭해서 편집)...',
+    photoEmpty: '아직 사진이 없어요',
+    photoEmptyDesc: '위의 "사진 추가" 버튼으로\n교재 사진이나 노트 이미지를 카드로 추가하세요.',
+  },
+  en: {
+    subtitle: 'Medical Terminology · BCIT Healthcare Unit Clerk',
+    terms: 'Terms', specialist: 'Specialists', ward: 'Wards', figures: 'Anatomy', photos: 'Photo Cards',
+    statTerms: 'Terms', statPhotos: 'Photos',
+    searchPH: 'Search...',
+    all: 'All', combining: 'Combining', suffix: 'Suffix', prefix: 'Prefix',
+    mode_list: 'List', mode_fc: 'Flashcard', mode_quiz: 'Quiz',
+    shuffle: '⇄ Shuffle',
+    flipHint: 'Click to flip',
+    flip: '↩ Flip',
+    speak: '🔊 Pronounce',
+    quizQ: 'What does this medical term mean?',
+    quizNext: 'Next →',
+    photosTitle: 'Save textbook images or notes as cards',
+    addPhoto: '＋ Add Photo',
+    deleteCard: 'Delete',
+    photoTitlePH: 'Title (click to edit)',
+    photoNotesPH: 'Notes (click to edit)...',
+    photoEmpty: 'No photos yet',
+    photoEmptyDesc: 'Use the "Add Photo" button above\nto add textbook images or note photos.',
+  },
+  es: {
+    subtitle: 'Terminología Médica · BCIT Healthcare Unit Clerk',
+    terms: 'Términos', specialist: 'Especialistas', ward: 'Salas', figures: 'Anatomía', photos: 'Fotos',
+    statTerms: 'Términos', statPhotos: 'Fotos',
+    searchPH: 'Buscar...',
+    all: 'Todo', combining: 'Combinado', suffix: 'Sufijo', prefix: 'Prefijo',
+    mode_list: 'Lista', mode_fc: 'Tarjetas', mode_quiz: 'Examen',
+    shuffle: '⇄ Mezclar',
+    flipHint: 'Clic para voltear',
+    flip: '↩ Voltear',
+    speak: '🔊 Pronunciar',
+    quizQ: '¿Qué significa este término médico?',
+    quizNext: 'Siguiente →',
+    photosTitle: 'Guarda imágenes del libro o notas como tarjetas',
+    addPhoto: '＋ Agregar Foto',
+    deleteCard: 'Eliminar',
+    photoTitlePH: 'Título (clic para editar)',
+    photoNotesPH: 'Notas (clic para editar)...',
+    photoEmpty: 'Sin fotos aún',
+    photoEmptyDesc: 'Usa el botón "Agregar Foto" para\nagregar imágenes del libro o notas.',
+  }
+};
+
+function t(key) { return (T[LANG] && T[LANG][key]) || T.ko[key] || key; }
+
+function applyLang() {
+  document.getElementById('appSubtitle').textContent = t('subtitle');
+  document.getElementById('statTermsLbl').textContent = t('statTerms');
+  document.getElementById('statPhotosLbl').textContent = t('statPhotos');
+  document.getElementById('tabTerms').textContent = '📚 ' + t('terms');
+  document.getElementById('tabSpecialist').textContent = '🩺 ' + t('specialist');
+  document.getElementById('tabWard').textContent = '🏥 ' + t('ward');
+  document.getElementById('tabFigures').textContent = '🔬 ' + t('figures');
+  document.getElementById('tabPhotos').textContent = '📸 ' + t('photos');
+  document.getElementById('searchBox').placeholder = t('searchPH');
+  document.getElementById('filterAll').textContent = t('all');
+  document.getElementById('filterCombining').textContent = t('combining');
+  document.getElementById('filterSuffix').textContent = t('suffix');
+  document.getElementById('filterPrefix').textContent = t('prefix');
+  document.getElementById('modeList').textContent = t('mode_list');
+  document.getElementById('modeFlashcard').textContent = t('mode_fc');
+  document.getElementById('modeQuiz').textContent = t('mode_quiz');
+  document.getElementById('fcShuffle').textContent = t('shuffle');
+  document.getElementById('fcHint').textContent = t('flipHint');
+  document.getElementById('fcFlip').textContent = t('flip');
+  document.getElementById('fcSpeakBtn').textContent = t('speak');
+  document.getElementById('quizQLabel').textContent = t('quizQ');
+  document.getElementById('quizNextBtn').textContent = t('quizNext');
+  document.getElementById('photosTitle').textContent = t('photosTitle');
+  document.getElementById('addPhotoLabel').textContent = t('addPhoto');
+  // Re-render ward labels if visible
+  if (document.getElementById('panelWard').classList.contains('visible')) renderWards();
+  renderPhotoGrid();
+}
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    LANG = btn.dataset.lang;
+    applyLang();
+  });
+});
+
+// ============================================================
+// TERMS DATA
+// ============================================================
+const DATA = [
+  // CH.1 — COMBINING FORMS
+  { term:'cardi/o', type:'combining', ko:'심장', en:'heart', es:'corazón', pronun:'카-디-오', chapter:1,
+    examples:[{en:'cardiology',ko:'심장학',es:'cardiología'},{en:'cardiomegaly',ko:'심장비대',es:'cardiomegalia'},{en:'electrocardiogram',ko:'심전도',es:'electrocardiograma'}]},
+  { term:'derm/a, derm/o', type:'combining', ko:'피부', en:'skin', es:'piel', pronun:'더-마/더-모', chapter:1,
+    examples:[{en:'dermatology',ko:'피부과학',es:'dermatología'},{en:'dermatitis',ko:'피부염',es:'dermatitis'}]},
+  { term:'gastr/o', type:'combining', ko:'위(胃)', en:'stomach', es:'estómago', pronun:'개-스트로', chapter:1,
+    examples:[{en:'gastroscopy',ko:'위내시경',es:'gastroscopía'},{en:'gastritis',ko:'위염',es:'gastritis'}]},
+  { term:'hepat/o', type:'combining', ko:'간(肝)', en:'liver', es:'hígado', pronun:'헤-파-토', chapter:1,
+    examples:[{en:'hepatitis',ko:'간염',es:'hepatitis'},{en:'hepatomegaly',ko:'간비대',es:'hepatomegalia'}]},
+  { term:'nephr/o', type:'combining', ko:'신장', en:'kidney', es:'riñón', pronun:'네-프로', chapter:1,
+    examples:[{en:'nephrology',ko:'신장학',es:'nefrología'},{en:'nephritis',ko:'신장염',es:'nefritis'}]},
+  { term:'neur/o', type:'combining', ko:'신경', en:'nerve', es:'nervio', pronun:'뉴-로', chapter:1,
+    examples:[{en:'neurology',ko:'신경학',es:'neurología'},{en:'neuropathy',ko:'신경병증',es:'neuropatía'}]},
+  { term:'oste/o', type:'combining', ko:'뼈', en:'bone', es:'hueso', pronun:'오-스테-오', chapter:1,
+    examples:[{en:'osteoporosis',ko:'골다공증',es:'osteoporosis'},{en:'osteomyelitis',ko:'골수염',es:'osteomielitis'}]},
+  { term:'pulmon/o', type:'combining', ko:'폐', en:'lung', es:'pulmón', pronun:'풀-모-노', chapter:1,
+    examples:[{en:'pulmonology',ko:'폐과학',es:'neumología'},{en:'pulmonary embolism',ko:'폐색전증',es:'embolia pulmonar'}]},
+  { term:'rhin/o', type:'combining', ko:'코', en:'nose', es:'nariz', pronun:'라이-노', chapter:1,
+    examples:[{en:'rhinoplasty',ko:'코성형',es:'rinoplastia'},{en:'rhinitis',ko:'비염',es:'rinitis'}]},
+  { term:'hem/o, hemat/o', type:'combining', ko:'혈액', en:'blood', es:'sangre', pronun:'헤-모/헤-마-토', chapter:1,
+    examples:[{en:'hematology',ko:'혈액학',es:'hematología'},{en:'hematoma',ko:'혈종',es:'hematoma'},{en:'hemorrhage',ko:'출혈',es:'hemorragia'}]},
+  { term:'arthr/o', type:'combining', ko:'관절', en:'joint', es:'articulación', pronun:'아-스로', chapter:1,
+    examples:[{en:'arthritis',ko:'관절염',es:'artritis'},{en:'arthroscopy',ko:'관절경검사',es:'artroscopía'}]},
+  { term:'onc/o', type:'combining', ko:'종양', en:'tumor / mass', es:'tumor', pronun:'온-코', chapter:1,
+    examples:[{en:'oncology',ko:'종양학',es:'oncología'},{en:'oncologist',ko:'종양전문의',es:'oncólogo'}]},
+  // CH.1 — SUFFIXES
+  { term:'-itis', type:'suffix', ko:'염증', en:'inflammation', es:'inflamación', pronun:'이-티스', chapter:1,
+    examples:[{en:'appendicitis',ko:'충수염',es:'apendicitis'},{en:'tonsillitis',ko:'편도염',es:'amigdalitis'},{en:'arthritis',ko:'관절염',es:'artritis'}]},
+  { term:'-ectomy', type:'suffix', ko:'절제술', en:'surgical removal', es:'extirpación quirúrgica', pronun:'엑-토-미', chapter:1,
+    examples:[{en:'appendectomy',ko:'충수절제술',es:'apendicectomía'},{en:'gastrectomy',ko:'위절제술',es:'gastrectomía'}]},
+  { term:'-plasty', type:'suffix', ko:'성형술/재건술', en:'surgical repair', es:'cirugía reconstructiva', pronun:'플-라-스-티', chapter:1,
+    examples:[{en:'rhinoplasty',ko:'코성형술',es:'rinoplastia'},{en:'angioplasty',ko:'혈관성형술',es:'angioplastia'}]},
+  { term:'-oscopy', type:'suffix', ko:'내시경 검사', en:'visual examination', es:'examen visual (endoscopia)', pronun:'오-스-코-피', chapter:1,
+    examples:[{en:'gastroscopy',ko:'위내시경',es:'gastroscopía'},{en:'colonoscopy',ko:'대장내시경',es:'colonoscopía'}]},
+  { term:'-ology', type:'suffix', ko:'학문/연구', en:'study of', es:'estudio de', pronun:'올-로-지', chapter:1,
+    examples:[{en:'cardiology',ko:'심장학',es:'cardiología'},{en:'neurology',ko:'신경학',es:'neurología'}]},
+  { term:'-algia', type:'suffix', ko:'통증', en:'pain', es:'dolor', pronun:'알-지-아', chapter:1,
+    examples:[{en:'neuralgia',ko:'신경통',es:'neuralgia'},{en:'myalgia',ko:'근육통',es:'mialgia'}]},
+  { term:'-megaly', type:'suffix', ko:'비대/확대', en:'enlargement', es:'agrandamiento', pronun:'메-갈-리', chapter:1,
+    examples:[{en:'cardiomegaly',ko:'심장비대',es:'cardiomegalia'},{en:'hepatomegaly',ko:'간비대',es:'hepatomegalia'}]},
+  { term:'-pathy', type:'suffix', ko:'질환/병', en:'disease / condition', es:'enfermedad', pronun:'파-씨', chapter:1,
+    examples:[{en:'neuropathy',ko:'신경병증',es:'neuropatía'},{en:'cardiomyopathy',ko:'심근병증',es:'cardiomiopatía'}]},
+  // CH.1 — PREFIXES
+  { term:'brady-', type:'prefix', ko:'느린', en:'slow', es:'lento', pronun:'브-레이-디', chapter:1,
+    examples:[{en:'bradycardia',ko:'서맥',es:'bradicardia'},{en:'bradypnea',ko:'느린호흡',es:'bradipnea'}]},
+  { term:'tachy-', type:'prefix', ko:'빠른', en:'fast / rapid', es:'rápido', pronun:'태-키', chapter:1,
+    examples:[{en:'tachycardia',ko:'빈맥',es:'taquicardia'},{en:'tachypnea',ko:'빠른호흡',es:'taquipnea'}]},
+  { term:'hyper-', type:'prefix', ko:'과도한/높은', en:'excessive / above normal', es:'excesivo', pronun:'하이-퍼', chapter:1,
+    examples:[{en:'hypertension',ko:'고혈압',es:'hipertensión'},{en:'hyperglycemia',ko:'고혈당',es:'hiperglucemia'}]},
+  { term:'hypo-', type:'prefix', ko:'부족한/낮은', en:'deficient / below normal', es:'deficiente', pronun:'하이-포', chapter:1,
+    examples:[{en:'hypotension',ko:'저혈압',es:'hipotensión'},{en:'hypoglycemia',ko:'저혈당',es:'hipoglucemia'}]},
+  { term:'peri-', type:'prefix', ko:'주위/둘러싼', en:'around / surrounding', es:'alrededor de', pronun:'페-리', chapter:1,
+    examples:[{en:'pericardium',ko:'심낭',es:'pericardio'},{en:'periosteum',ko:'골막',es:'periostio'}]},
+  { term:'trans-', type:'prefix', ko:'가로지르는/통과하는', en:'through / across', es:'a través de', pronun:'트-랜스', chapter:1,
+    examples:[{en:'transplant',ko:'이식',es:'trasplante'},{en:'transfusion',ko:'수혈',es:'transfusión'}]},
+  // CH.2 — BODY ORGANIZATION
+  { term:'cyt/o', type:'combining', ko:'세포', en:'cell', es:'célula', pronun:'사이-토', chapter:2,
+    examples:[{en:'cytology',ko:'세포학',es:'citología'},{en:'cytoplasm',ko:'세포질',es:'citoplasma'}]},
+  { term:'hist/o', type:'combining', ko:'조직', en:'tissue', es:'tejido', pronun:'히-스토', chapter:2,
+    examples:[{en:'histology',ko:'조직학',es:'histología'},{en:'histopathology',ko:'조직병리학',es:'histopatología'}]},
+  { term:'viscer/o', type:'combining', ko:'내장', en:'organ / viscera', es:'víscera', pronun:'비-스세-로', chapter:2,
+    examples:[{en:'visceral',ko:'내장의',es:'visceral'},{en:'visceroptosis',ko:'내장하수',es:'visceróptosis'}]},
+  { term:'thorac/o', type:'combining', ko:'흉부', en:'chest / thorax', es:'tórax', pronun:'쏘-라-코', chapter:2,
+    examples:[{en:'thoracotomy',ko:'흉강절개술',es:'toracotomía'},{en:'thoracic cavity',ko:'흉강',es:'cavidad torácica'}]},
+  { term:'abdomin/o', type:'combining', ko:'복부', en:'abdomen', es:'abdomen', pronun:'압-도-미-노', chapter:2,
+    examples:[{en:'abdominal',ko:'복부의',es:'abdominal'},{en:'abdominoplasty',ko:'복부성형술',es:'abdominoplastia'}]},
+
+  // CH.2 — COMBINING FORMS (Body as a Whole)
+  { term:'adip/o', type:'combining', ko:'지방', en:'fat', es:'grasa', pronun:'아-딥-오', chapter:2,
+    examples:[{en:'adipose',ko:'지방의',es:'adiposo'},{en:'adipose tissue',ko:'지방조직',es:'tejido adiposo'}]},
+  { term:'anter/o', type:'combining', ko:'앞/전방', en:'front / anterior', es:'anterior', pronun:'안-테-로', chapter:2,
+    examples:[{en:'anterior',ko:'전방의',es:'anterior'},{en:'anteroposterior',ko:'전후방',es:'anteroposterior'}]},
+  { term:'cervic/o', type:'combining', ko:'목/자궁경부', en:'neck / cervix', es:'cuello / cérvix', pronun:'서-비-코', chapter:2,
+    examples:[{en:'cervical',ko:'경부의',es:'cervical'},{en:'cervicitis',ko:'자궁경부염',es:'cervicitis'}]},
+  { term:'chondr/o', type:'combining', ko:'연골', en:'cartilage', es:'cartílago', pronun:'콘-드로', chapter:2,
+    examples:[{en:'chondroma',ko:'연골종(양성)',es:'condroma'},{en:'chondrosarcoma',ko:'연골육종(악성)',es:'condrosarcoma'},{en:'hypochondriac',ko:'늑연골 하부',es:'hipocondríaco'}]},
+  { term:'chrom/o', type:'combining', ko:'색', en:'color', es:'color', pronun:'크로-모', chapter:2,
+    examples:[{en:'chromosomes',ko:'염색체',es:'cromosomas'},{en:'chromatin',ko:'염색질',es:'cromatina'}]},
+  { term:'coccyg/o', type:'combining', ko:'미골(꼬리뼈)', en:'coccyx / tailbone', es:'cóccix / coxis', pronun:'콕-시-고', chapter:2,
+    examples:[{en:'coccygeal',ko:'미골의',es:'coccígeo'},{en:'coccygectomy',ko:'미골절제술',es:'coccigectomía'}]},
+  { term:'crani/o', type:'combining', ko:'두개골', en:'skull / cranium', es:'cráneo', pronun:'크레-이-니-오', chapter:2,
+    examples:[{en:'craniotomy',ko:'두개골절개술',es:'craneotomía'},{en:'cranial cavity',ko:'두개강',es:'cavidad craneal'}]},
+  { term:'dist/o', type:'combining', ko:'먼/원위', en:'far / distal', es:'distal', pronun:'디-스토', chapter:2,
+    examples:[{en:'distal',ko:'원위의',es:'distal'},{en:'distal phalanx',ko:'말절골',es:'falange distal'}]},
+  { term:'dors/o', type:'combining', ko:'등/후방', en:'back / posterior', es:'dorsal', pronun:'도-르소', chapter:2,
+    examples:[{en:'dorsal',ko:'배면의',es:'dorsal'},{en:'dorsal cavity',ko:'배측강',es:'cavidad dorsal'}]},
+  { term:'ili/o', type:'combining', ko:'장골(골반뼈)', en:'ilium / hip bone', es:'ilion / hueso de la cadera', pronun:'일-리-오', chapter:2,
+    examples:[{en:'iliac',ko:'장골의',es:'ilíaco'},{en:'iliac crest',ko:'장골능',es:'cresta ilíaca'}]},
+  { term:'inguin/o', type:'combining', ko:'서혜부(사타구니)', en:'groin', es:'ingle', pronun:'잉-귀-노', chapter:2,
+    examples:[{en:'inguinal',ko:'서혜부의',es:'inguinal'},{en:'inguinal hernia',ko:'서혜부탈장',es:'hernia inguinal'}]},
+  { term:'kary/o', type:'combining', ko:'세포핵', en:'nucleus (cell)', es:'núcleo celular', pronun:'카-리-오', chapter:2,
+    examples:[{en:'karyotype',ko:'핵형(염색체사진)',es:'cariotipo'},{en:'karyoplasm',ko:'핵질',es:'carioplasma'}]},
+  { term:'later/o', type:'combining', ko:'측면/옆', en:'side / lateral', es:'lateral', pronun:'라-테-로', chapter:2,
+    examples:[{en:'lateral',ko:'측면의',es:'lateral'},{en:'bilateral',ko:'양측의',es:'bilateral'}]},
+  { term:'lumb/o', type:'combining', ko:'허리/요부', en:'lower back / lumbar', es:'lumbar', pronun:'룸-보', chapter:2,
+    examples:[{en:'lumbar',ko:'요부의',es:'lumbar'},{en:'lumbosacral',ko:'요천골의',es:'lumbosacro'},{en:'lumbar vertebrae',ko:'요추',es:'vértebras lumbares'}]},
+  { term:'medi/o', type:'combining', ko:'중간/내측', en:'middle / medial', es:'medial', pronun:'미-디-오', chapter:2,
+    examples:[{en:'medial',ko:'내측의',es:'medial'},{en:'mediastinum',ko:'종격동',es:'mediastino'}]},
+  { term:'nucle/o', type:'combining', ko:'핵', en:'nucleus', es:'núcleo', pronun:'뉴-클리-오', chapter:2,
+    examples:[{en:'nucleic acid',ko:'핵산',es:'ácido nucleico'},{en:'nucleotide',ko:'뉴클레오타이드',es:'nucleótido'}]},
+  { term:'pelv/i', type:'combining', ko:'골반', en:'pelvis', es:'pelvis', pronun:'펠-비', chapter:2,
+    examples:[{en:'pelvic',ko:'골반의',es:'pélvico'},{en:'pelvic cavity',ko:'골반강',es:'cavidad pélvica'}]},
+  { term:'pharyng/o', type:'combining', ko:'인두(목구멍)', en:'pharynx / throat', es:'faringe', pronun:'파-린-고', chapter:2,
+    examples:[{en:'pharyngeal',ko:'인두의',es:'faríngeo'},{en:'pharyngitis',ko:'인두염',es:'faringitis'}]},
+  { term:'poster/o', type:'combining', ko:'뒤/후방', en:'back / posterior', es:'posterior', pronun:'포-스-테-로', chapter:2,
+    examples:[{en:'posterior',ko:'후방의',es:'posterior'},{en:'posteroanterior',ko:'후전방',es:'posteroanterior'}]},
+  { term:'proxim/o', type:'combining', ko:'가까운/근위', en:'near / proximal', es:'proximal', pronun:'프록-시-모', chapter:2,
+    examples:[{en:'proximal',ko:'근위의',es:'proximal'},{en:'proximal phalanx',ko:'기절골',es:'falange proximal'}]},
+  { term:'sacr/o', type:'combining', ko:'천골', en:'sacrum', es:'sacro', pronun:'사-크로', chapter:2,
+    examples:[{en:'sacral',ko:'천골의',es:'sacral'},{en:'sacroiliac',ko:'천장관절',es:'sacroilíaco'}]},
+  { term:'sarc/o', type:'combining', ko:'살/결합조직', en:'flesh / connective tissue', es:'carne / tejido conjuntivo', pronun:'사-르코', chapter:2,
+    examples:[{en:'sarcoma',ko:'육종(악성종양)',es:'sarcoma'},{en:'chondrosarcoma',ko:'연골육종',es:'condrosarcoma'}]},
+  { term:'spin/o', type:'combining', ko:'척추/등뼈', en:'spine / backbone', es:'columna vertebral', pronun:'스파이-노', chapter:2,
+    examples:[{en:'spinal',ko:'척추의',es:'espinal'},{en:'spinal column',ko:'척주',es:'columna vertebral'},{en:'spinal cord',ko:'척수',es:'médula espinal'}]},
+  { term:'thel/o', type:'combining', ko:'유두/표피', en:'nipple / epithelium', es:'pezón / epitelio', pronun:'씨-로', chapter:2,
+    examples:[{en:'epithelial',ko:'상피의',es:'epitelial'},{en:'epithelium',ko:'상피조직',es:'epitelio'}]},
+  { term:'trache/o', type:'combining', ko:'기관(숨관)', en:'trachea / windpipe', es:'tráquea', pronun:'트레-이-키-오', chapter:2,
+    examples:[{en:'tracheal',ko:'기관의',es:'traqueal'},{en:'tracheotomy',ko:'기관절개술',es:'traqueotomía'}]},
+  { term:'umbilic/o', type:'combining', ko:'배꼽', en:'navel / umbilicus', es:'ombligo', pronun:'엄-빌-리-코', chapter:2,
+    examples:[{en:'umbilical',ko:'배꼽의',es:'umbilical'},{en:'umbilical region',ko:'배꼽부위',es:'región umbilical'}]},
+  { term:'ventr/o', type:'combining', ko:'배/전방', en:'belly / ventral', es:'ventral', pronun:'벤-트로', chapter:2,
+    examples:[{en:'ventral',ko:'복측의',es:'ventral'},{en:'ventral cavity',ko:'복측강',es:'cavidad ventral'}]},
+  { term:'vertebr/o', type:'combining', ko:'척추뼈', en:'vertebra / backbone', es:'vértebra', pronun:'버-테-브로', chapter:2,
+    examples:[{en:'vertebral',ko:'척추의',es:'vertebral'},{en:'vertebrae',ko:'척추뼈들',es:'vértebras'},{en:'intervertebral',ko:'추간의',es:'intervertebral'}]},
+
+  // CH.2 — PREFIXES
+  { term:'ana-', type:'prefix', ko:'위로/동화', en:'up / building up', es:'hacia arriba', pronun:'아-나', chapter:2,
+    examples:[{en:'anabolism',ko:'동화작용',es:'anabolismo'},{en:'anabolic steroids',ko:'단백동화스테로이드',es:'esteroides anabólicos'}]},
+  { term:'cata-', type:'prefix', ko:'아래로/이화', en:'down / breaking down', es:'hacia abajo', pronun:'카-타', chapter:2,
+    examples:[{en:'catabolism',ko:'이화작용',es:'catabolismo'},{en:'catalyst',ko:'촉매',es:'catalizador'}]},
+  { term:'epi-', type:'prefix', ko:'위에/~위', en:'above / upon', es:'sobre / encima de', pronun:'에-피', chapter:2,
+    examples:[{en:'epigastric',ko:'상복부의',es:'epigástrico'},{en:'epinephrine',ko:'에피네프린',es:'epinefrina'},{en:'epithelial',ko:'상피의',es:'epitelial'}]},
+  { term:'inter-', type:'prefix', ko:'사이/간', en:'between', es:'entre', pronun:'인-터', chapter:2,
+    examples:[{en:'intervertebral',ko:'추간의',es:'intervertebral'},{en:'intercostal',ko:'늑간의',es:'intercostal'}]},
+  { term:'intra-', type:'prefix', ko:'안/내부', en:'within / inside', es:'dentro de', pronun:'인-트라', chapter:2,
+    examples:[{en:'intravenous',ko:'정맥내',es:'intravenoso'},{en:'intracellular',ko:'세포내',es:'intracelular'}]},
+  { term:'meta-', type:'prefix', ko:'변화/변환', en:'change / beyond', es:'cambio / más allá', pronun:'메-타', chapter:2,
+    examples:[{en:'metabolism',ko:'신진대사',es:'metabolismo'},{en:'metastasis',ko:'전이',es:'metástasis'}]},
+
+  // CH.2 — SUFFIXES
+  { term:'-eal', type:'suffix', ko:'~에 관한', en:'pertaining to', es:'relativo a', pronun:'이-얼', chapter:2,
+    examples:[{en:'pharyngeal',ko:'인두의',es:'faríngeo'},{en:'tracheal',ko:'기관의',es:'traqueal'}]},
+  { term:'-iac', type:'suffix', ko:'~에 관한', en:'pertaining to', es:'relativo a', pronun:'이-악', chapter:2,
+    examples:[{en:'cardiac',ko:'심장의',es:'cardíaco'},{en:'hypochondriac',ko:'늑연골하의',es:'hipocondríaco'}]},
+  { term:'-ior', type:'suffix', ko:'~에 관한', en:'pertaining to', es:'relativo a', pronun:'이-오르', chapter:2,
+    examples:[{en:'anterior',ko:'전방의',es:'anterior'},{en:'posterior',ko:'후방의',es:'posterior'},{en:'superior',ko:'상위의',es:'superior'}]},
+  { term:'-plasm', type:'suffix', ko:'형성/물질', en:'formation / substance', es:'formación', pronun:'플-라즘', chapter:2,
+    examples:[{en:'cytoplasm',ko:'세포질',es:'citoplasma'},{en:'neoplasm',ko:'신생물',es:'neoplasma'}]},
+  { term:'-somes', type:'suffix', ko:'몸체', en:'bodies', es:'cuerpos', pronun:'소-므즈', chapter:2,
+    examples:[{en:'chromosomes',ko:'염색체',es:'cromosomas'},{en:'ribosomes',ko:'리보솜',es:'ribosomas'}]},
+  { term:'-type', type:'suffix', ko:'분류/사진', en:'picture / classification', es:'clasificación', pronun:'타-입', chapter:2,
+    examples:[{en:'karyotype',ko:'핵형',es:'cariotipo'},{en:'phenotype',ko:'표현형',es:'fenotipo'}]},
+
+  // CH.2 — POSITIONAL & DIRECTIONAL TERMS (as combining forms/vocab)
+  { term:'anter/o → anterior', type:'combining', ko:'앞면/전방', en:'front of body (anterior/ventral)', es:'cara anterior del cuerpo', pronun:'안-테-리-어', chapter:2,
+    examples:[{en:'anteroposterior (AP)',ko:'전후방',es:'anteroposterior'},{en:'anterior chamber',ko:'전방',es:'cámara anterior'}]},
+  { term:'poster/o → posterior', type:'combining', ko:'뒷면/후방', en:'back of body (posterior/dorsal)', es:'cara posterior del cuerpo', pronun:'포-스-티-리-어', chapter:2,
+    examples:[{en:'posteroanterior (PA)',ko:'후전방',es:'posteroanterior'},{en:'posterior tibial',ko:'후경골',es:'tibial posterior'}]},
+  { term:'super/o → superior', type:'combining', ko:'위/상위', en:'above / upper', es:'superior / por encima', pronun:'수-피-리-어', chapter:2,
+    examples:[{en:'superior vena cava',ko:'상대정맥',es:'vena cava superior'},{en:'superior mesenteric',ko:'상장간막',es:'mesentérica superior'}]},
+  { term:'infer/o → inferior', type:'combining', ko:'아래/하위', en:'below / lower', es:'inferior / por debajo', pronun:'인-피-리-어', chapter:2,
+    examples:[{en:'inferior vena cava',ko:'하대정맥',es:'vena cava inferior'},{en:'inferior rectus',ko:'하직근',es:'recto inferior'}]},
+  { term:'proxim/o → proximal', type:'combining', ko:'가까운(근위)', en:'near trunk / proximal', es:'proximal', pronun:'프록-시-말', chapter:2,
+    examples:[{en:'proximal femur',ko:'근위 대퇴골',es:'fémur proximal'},{en:'proximal tubule',ko:'근위세뇨관',es:'túbulo proximal'}]},
+  { term:'dist/o → distal', type:'combining', ko:'먼(원위)', en:'far from trunk / distal', es:'distal', pronun:'디-스-탈', chapter:2,
+    examples:[{en:'distal radius',ko:'원위 요골',es:'radio distal'},{en:'distal tubule',ko:'원위세뇨관',es:'túbulo distal'}]},
+  { term:'later/o → lateral', type:'combining', ko:'옆/측면', en:'side / lateral', es:'lateral', pronun:'라-테-랄', chapter:2,
+    examples:[{en:'lateral malleolus',ko:'외측 복사뼈',es:'maléolo lateral'},{en:'bilateral',ko:'양측의',es:'bilateral'}]},
+  { term:'medi/o → medial', type:'combining', ko:'중간/내측', en:'middle / medial', es:'medial', pronun:'미-디-알', chapter:2,
+    examples:[{en:'medial meniscus',ko:'내측 반월판',es:'menisco medial'},{en:'medial malleolus',ko:'내측 복사뼈',es:'maléolo medial'}]},
+];
+
+// ============================================================
+// SPECIALISTS DATA
+// ============================================================
+const SPECIALISTS = [
+  { title:'Cardiologist', ko:'심장 전문의', es:'Cardiólogo', pronun:'카-디-올-로-지스트', type:'medical',
+    desc:{ ko:'심장 및 혈관 질환을 전문으로 진단하고 치료한다.', en:'Diagnoses and treats heart and vascular diseases.', es:'Diagnostica y trata enfermedades del corazón y vasos sanguíneos.' },
+    treats:['Arrhythmia 부정맥','Heart failure 심부전','Coronary artery disease 관상동맥질환','Hypertension 고혈압']},
+  { title:'Neurologist', ko:'신경과 전문의', es:'Neurólogo', pronun:'뉴-롤-로-지스트', type:'medical',
+    desc:{ ko:'뇌, 척수, 말초신경 질환을 전문으로 한다.', en:'Specializes in brain, spinal cord, and peripheral nerve disorders.', es:'Especialista en enfermedades del cerebro, médula espinal y nervios periféricos.' },
+    treats:['Stroke 뇌졸중','Epilepsy 간질','Parkinson disease 파킨슨병','Multiple sclerosis 다발성경화증']},
+  { title:'Orthopedic Surgeon', ko:'정형외과 전문의', es:'Cirujano Ortopédico', pronun:'오-쏘-피-딕', type:'surgical',
+    desc:{ ko:'근골격계(뼈, 관절, 인대, 힘줄) 질환을 외과적으로 치료한다.', en:'Surgically treats musculoskeletal conditions including bones, joints, and tendons.', es:'Trata quirúrgicamente enfermedades del sistema musculoesquelético.' },
+    treats:['Fracture repair 골절치료','Joint replacement 관절치환','ACL repair 전십자인대','Spinal fusion 척추유합']},
+  { title:'Gastroenterologist', ko:'소화기내과 전문의', es:'Gastroenterólogo', pronun:'개-스트로-엔-테-롤-로-지스트', type:'medical',
+    desc:{ ko:'식도, 위, 장, 간, 췌장 등 소화기계 질환을 전문으로 한다.', en:'Specializes in digestive system disorders including the esophagus, stomach, and intestines.', es:'Especialista en enfermedades del sistema digestivo.' },
+    treats:['Gastritis 위염','Crohn disease 크론병','Colonoscopy 대장내시경','Hepatitis 간염']},
+  { title:'Pulmonologist', ko:'호흡기내과 전문의', es:'Neumólogo', pronun:'풀-모-놀-로-지스트', type:'medical',
+    desc:{ ko:'폐와 기도 질환(천식, COPD 등)을 전문으로 한다.', en:'Specializes in lung and airway diseases such as asthma and COPD.', es:'Especialista en enfermedades pulmonares y de las vías respiratorias.' },
+    treats:['Asthma 천식','COPD','Pneumonia 폐렴','Pulmonary embolism 폐색전증']},
+  { title:'Dermatologist', ko:'피부과 전문의', es:'Dermatólogo', pronun:'더-마-톨-로-지스트', type:'medical',
+    desc:{ ko:'피부, 모발, 손발톱의 질환과 피부암을 전문으로 한다.', en:'Specializes in skin, hair, and nail diseases, including skin cancer.', es:'Especialista en enfermedades de la piel, cabello y uñas.' },
+    treats:['Melanoma 흑색종','Eczema 습진','Psoriasis 건선','Acne 여드름']},
+  { title:'Oncologist', ko:'종양 전문의', es:'Oncólogo', pronun:'온-콜-로-지스트', type:'medical',
+    desc:{ ko:'암의 진단, 항암치료, 방사선 치료를 담당한다.', en:'Diagnoses and treats cancer using chemotherapy, radiation, and other modalities.', es:'Diagnostica y trata el cáncer mediante quimioterapia y radioterapia.' },
+    treats:['Chemotherapy 항암치료','Radiation therapy 방사선치료','Immunotherapy 면역치료','Biopsy staging 병기판정']},
+  { title:'Radiologist', ko:'영상의학과 전문의', es:'Radiólogo', pronun:'레이-디-올-로-지스트', type:'diagnostic',
+    desc:{ ko:'X선, CT, MRI, 초음파 등 영상을 판독하고 중재 시술을 담당한다.', en:'Interprets X-ray, CT, MRI, and ultrasound images; performs interventional procedures.', es:'Interpreta imágenes de rayos X, TC, RM y ecografías.' },
+    treats:['X-ray 엑스레이','CT scan CT','MRI','Interventional procedures 중재시술']},
+  { title:'Pathologist', ko:'병리과 전문의', es:'Patólogo', pronun:'파-쏠-로-지스트', type:'diagnostic',
+    desc:{ ko:'생검 조직, 혈액 등을 현미경으로 검사하고 사망 원인을 규명한다.', en:'Examines biopsies, blood, and tissue under a microscope to diagnose diseases.', es:'Examina biopsias y tejidos al microscopio para diagnosticar enfermedades.' },
+    treats:['Biopsy 생검','Cytology 세포학','Autopsy 부검','Clinical lab 검사실']},
+];
+
+// ============================================================
+// WARD DATA
+// ============================================================
+const WARDS = [
+  { section:{ko:'입원 병동', en:'Inpatient Wards', es:'Salas de Hospitalización'}, icon:'🏨',
+    items:[
+      { en:'Medical Ward', abbr:'MW', ko:'내과 병동', es:'Sala Médica', desc:{ko:'내과적 질환 환자 입원 치료 병동', en:'Inpatient ward for medical (non-surgical) patients', es:'Sala de hospitalización para pacientes médicos'} },
+      { en:'Surgical Ward', abbr:'SW', ko:'외과 병동', es:'Sala Quirúrgica', desc:{ko:'수술 전후 환자 관리 병동', en:'Pre- and post-operative patient care', es:'Atención de pacientes pre y post operatorios'} },
+      { en:'Orthopedic Ward', abbr:'', ko:'정형외과 병동', es:'Sala Ortopédica', desc:{ko:'골절, 관절 수술 환자 담당', en:'Bone, joint, and musculoskeletal patients', es:'Pacientes con fracturas y cirugías articulares'} },
+      { en:'Oncology Ward', abbr:'ONCO', ko:'종양내과 병동', es:'Sala de Oncología', desc:{ko:'항암치료 및 암 환자 입원', en:'Cancer patients receiving chemotherapy/treatment', es:'Pacientes oncológicos en tratamiento'} },
+      { en:'Cardiology Ward', abbr:'CARD', ko:'심장내과 병동', es:'Sala de Cardiología', desc:{ko:'심장 질환 환자 전담', en:'Inpatient cardiac care', es:'Atención hospitalaria de enfermedades cardíacas'} },
+      { en:'Neurology Ward', abbr:'NEURO', ko:'신경과 병동', es:'Sala de Neurología', desc:{ko:'뇌졸중, 간질 등 신경계 질환', en:'Stroke, epilepsy, and neurological conditions', es:'Accidentes cerebrovasculares y trastornos neurológicos'} },
+      { en:'Pediatric Ward', abbr:'PEDS', ko:'소아과 병동', es:'Sala Pediátrica', desc:{ko:'영유아 및 청소년 입원 전담', en:'Inpatient care for children and adolescents', es:'Hospitalización de niños y adolescentes'} },
+      { en:'Psychiatric Ward', abbr:'PSYCH', ko:'정신건강의학과 병동', es:'Sala Psiquiátrica', desc:{ko:'정신질환 환자 입원 치료', en:'Inpatient mental health care', es:'Hospitalización psiquiátrica'} },
+    ]},
+  { section:{ko:'집중치료 / 응급', en:'Critical Care / Emergency', es:'Cuidados Intensivos / Urgencias'}, icon:'🚨',
+    items:[
+      { en:'Emergency Department', abbr:'ED / ER', ko:'응급실', es:'Urgencias', desc:{ko:'24시간 응급 환자 접수 및 처치', en:'24-hour emergency patient triage and treatment', es:'Triaje y tratamiento de emergencias 24 horas'} },
+      { en:'Intensive Care Unit', abbr:'ICU', ko:'중환자실', es:'UCI', desc:{ko:'생명 위급 중증 환자 집중치료', en:'Critical care for life-threatening conditions', es:'Cuidados intensivos para condiciones críticas'} },
+      { en:'Cardiac Care Unit', abbr:'CCU', ko:'심장 중환자실', es:'UCC', desc:{ko:'심근경색, 심부전 집중치료', en:'Intensive care for cardiac emergencies', es:'Cuidados intensivos cardíacos'} },
+      { en:'NICU', abbr:'NICU', ko:'신생아 중환자실', es:'UCIN', desc:{ko:'미숙아 및 중증 신생아 전문 치료', en:'Premature and critically ill newborns', es:'Neonatos prematuros y en estado crítico'} },
+    ]},
+  { section:{ko:'수술 / 시술', en:'Surgery / Procedures', es:'Cirugía / Procedimientos'}, icon:'🔬',
+    items:[
+      { en:'Operating Room', abbr:'OR', ko:'수술실', es:'Quirófano', desc:{ko:'외과적 수술이 이루어지는 무균 공간', en:'Sterile environment for all surgical procedures', es:'Espacio estéril para procedimientos quirúrgicos'} },
+      { en:'Post-Anesthesia Care Unit', abbr:'PACU', ko:'회복실', es:'URPA', desc:{ko:'수술 후 마취에서 회복 모니터링', en:'Post-surgical anesthesia recovery monitoring', es:'Recuperación post-anestesia'} },
+      { en:'Endoscopy Suite', abbr:'', ko:'내시경실', es:'Sala de Endoscopía', desc:{ko:'위/대장 내시경 검사 및 시술', en:'GI endoscopy and colonoscopy procedures', es:'Endoscopias gastrointestinales'} },
+    ]},
+  { section:{ko:'외래 / 행정', en:'Outpatient / Admin', es:'Ambulatorio / Administración'}, icon:'📋',
+    items:[
+      { en:'Outpatient Department', abbr:'OPD', ko:'외래 진료부', es:'Consultas Externas', desc:{ko:'입원 없이 통원하는 환자 진료', en:'Walk-in and appointment-based patient care', es:'Atención sin hospitalización'} },
+      { en:'Radiology Department', abbr:'RAD', ko:'영상의학과', es:'Radiología', desc:{ko:'X선, CT, MRI, 초음파 촬영', en:'X-ray, CT, MRI, and ultrasound imaging', es:'Rayos X, TC, RM y ecografías'} },
+      { en:'Health Records / HIM', abbr:'HIM', ko:'의무기록실', es:'Registros Médicos', desc:{ko:'환자 의료 기록 보관 및 관리', en:'Patient medical record storage and management', es:'Almacenamiento y gestión de registros médicos'} },
+      { en:'Unit Clerk / Nursing Station', abbr:'', ko:'간호사 스테이션', es:'Estación de Enfermería', desc:{ko:'병동 행정 업무 중심 공간 (Unit Clerk 근무)', en:'Administrative hub for ward — Unit Clerk workspace', es:'Centro administrativo de la sala — puesto del empleado de unidad'} },
+      { en:'Triage', abbr:'', ko:'트리아지', es:'Triaje', desc:{ko:'응급실 환자 긴급도 분류', en:'Emergency patient priority classification', es:'Clasificación de urgencia del paciente'} },
+    ]},
+];
+
+// ============================================================
+// ANATOMY FIGURES DATA
+// ============================================================
+const FIGURES = [
+  {
+    id:'fig2-1',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'세포 구조 · Structural Organization',
+    title:'Figure 2-1 · Cell Structure',
+    desc:{ ko:'세포의 주요 구성 요소 — 핵, 세포질, 세포막, 미토콘드리아, 리보솜', en:'Major components of the cell — nucleus, cytoplasm, membrane, mitochondria, ribosomes', es:'Componentes principales de la célula' },
+    svg:`<svg viewBox="0 0 560 380" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <defs>
+    <radialGradient id="cg" cx="40%" cy="35%" r="65%"><stop offset="0%" stop-color="#1e1240"/><stop offset="100%" stop-color="#08080f"/></radialGradient>
+    <radialGradient id="ng" cx="40%" cy="35%" r="60%"><stop offset="0%" stop-color="#3a2800"/><stop offset="100%" stop-color="#160f00"/></radialGradient>
+  </defs>
+  <rect width="560" height="380" fill="#1e1a14"/>
+  <!-- Cell body -->
+  <ellipse cx="245" cy="200" rx="200" ry="160" fill="url(#cg)" stroke="#6c5ce7" stroke-width="3.5" opacity="0.9"/>
+  <ellipse cx="245" cy="200" rx="193" ry="153" fill="none" stroke="#4a3fa0" stroke-width="1.5" opacity="0.5"/>
+  <!-- Nucleus -->
+  <ellipse cx="230" cy="195" rx="60" ry="50" fill="url(#ng)" stroke="#fdcb6e" stroke-width="2.5"/>
+  <ellipse cx="230" cy="195" rx="54" ry="44" fill="none" stroke="rgba(253,203,110,0.3)" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- Nucleolus -->
+  <circle cx="225" cy="190" r="14" fill="rgba(253,121,168,0.3)" stroke="#fd79a8" stroke-width="1.5"/>
+  <!-- Nuclear pores -->
+  <circle cx="248" cy="155" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <circle cx="282" cy="172" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <circle cx="286" cy="215" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <circle cx="260" cy="241" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <circle cx="175" cy="240" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <circle cx="170" cy="195" r="4" fill="rgba(253,203,110,0.5)" stroke="#fdcb6e" stroke-width="1"/>
+  <!-- Mitochondria -->
+  <ellipse cx="330" cy="160" rx="28" ry="14" fill="rgba(220,50,50,0.25)" stroke="#e05050" stroke-width="1.5" transform="rotate(-20,330,160)"/>
+  <path d="M312,155 Q320,150 325,155 Q320,160 312,155" fill="none" stroke="rgba(220,80,80,0.4)" stroke-width="1" transform="rotate(-20,312,155)"/>
+  <ellipse cx="350" cy="270" rx="24" ry="12" fill="rgba(220,50,50,0.25)" stroke="#e05050" stroke-width="1.5" transform="rotate(15,350,270)"/>
+  <!-- ER (rough) -->
+  <path d="M310,200 Q325,195 330,205 Q325,215 310,210 Q315,205 310,200" fill="none" stroke="#00cec9" stroke-width="1.5"/>
+  <path d="M310,220 Q325,215 330,225 Q325,235 310,230 Q315,225 310,220" fill="none" stroke="#00cec9" stroke-width="1.5"/>
+  <circle cx="335" cy="200" r="3" fill="rgba(0,206,201,0.4)"/>
+  <circle cx="335" cy="215" r="3" fill="rgba(0,206,201,0.4)"/>
+  <circle cx="335" cy="230" r="3" fill="rgba(0,206,201,0.4)"/>
+  <!-- Golgi -->
+  <path d="M155,265 Q185,255 190,265" fill="none" stroke="#a29bfe" stroke-width="2"/>
+  <path d="M158,272 Q188,262 193,272" fill="none" stroke="#a29bfe" stroke-width="2"/>
+  <path d="M161,279 Q191,269 196,279" fill="none" stroke="#a29bfe" stroke-width="1.5"/>
+  <!-- Vacuole -->
+  <circle cx="165" cy="145" r="18" fill="rgba(108,92,231,0.12)" stroke="#6c5ce7" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <!-- Labels -->
+  <line x1="230" y1="190" x2="420" y2="80" stroke="rgba(253,203,110,0.5)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="70" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#fdcb6e">Nucleus 핵</text>
+  <line x1="225" y1="190" x2="420" y2="110" stroke="rgba(253,121,168,0.4)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="105" font-family="DM Sans,sans-serif" font-size="10" fill="#fd79a8">Nucleolus 인</text>
+  <line x1="330" y1="155" x2="420" y2="140" stroke="rgba(224,80,80,0.5)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="135" font-family="DM Sans,sans-serif" font-size="10" fill="#ff7675">Mitochondria 미토콘드리아</text>
+  <line x1="325" y1="215" x2="420" y2="170" stroke="rgba(0,206,201,0.5)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="165" font-family="DM Sans,sans-serif" font-size="10" fill="#00cec9">Rough ER 소포체</text>
+  <line x1="175" y1="270" x2="420" y2="200" stroke="rgba(162,155,254,0.5)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="195" font-family="DM Sans,sans-serif" font-size="10" fill="#a29bfe">Golgi 골지체</text>
+  <line x1="165" y1="145" x2="420" y2="230" stroke="rgba(108,92,231,0.4)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="225" font-family="DM Sans,sans-serif" font-size="10" fill="#6c5ce7">Vacuole 공포</text>
+  <line x1="400" y1="200" x2="420" y2="260" stroke="rgba(108,92,231,0.5)" stroke-width="1" stroke-dasharray="3,3"/>
+  <text x="425" y="255" font-family="DM Sans,sans-serif" font-size="10" fill="#a29bfe">Cell membrane 세포막</text>
+  <text x="280" y="370" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="700" fill="rgba(255,255,255,0.35)">세포 구조 · Cell Structure (cyt/o, hist/o)</text>
+</svg>`
+  },
+  {
+    id:'fig2-2',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'신체 공강 · Body Cavities',
+    title:'Figure 2-2 · Body Cavities',
+    desc:{ ko:'신체 공강 — 두개강, 흉강, 복강, 골반강', en:'Body cavities — cranial, thoracic, abdominal, pelvic', es:'Cavidades corporales — craneal, torácica, abdominal, pélvica' },
+    svg:`<svg viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <defs>
+    <linearGradient id="bodyg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a1025"/><stop offset="100%" stop-color="#08080f"/></linearGradient>
+  </defs>
+  <rect width="480" height="420" fill="#1e1a14"/>
+  <!-- Body outline -->
+  <path d="M170,30 Q215,20 245,22 Q275,20 310,30 Q325,55 320,85 Q335,90 338,115 Q330,130 315,135 Q318,170 315,210 Q318,260 314,310 Q310,360 290,390 Q270,405 245,406 Q220,405 200,390 Q180,360 176,310 Q172,260 175,210 Q172,170 165,135 Q150,130 142,115 Q145,90 160,85 Q155,55 170,30Z" fill="url(#bodyg)" stroke="#4a3fa0" stroke-width="2.5"/>
+  <!-- Head -->
+  <ellipse cx="245" cy="28" rx="46" ry="38" fill="rgba(30,20,50,0.8)" stroke="#6c5ce7" stroke-width="2"/>
+  <!-- Cranial cavity -->
+  <ellipse cx="245" cy="22" rx="34" ry="26" fill="rgba(108,92,231,0.18)" stroke="#a29bfe" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <!-- Thoracic cavity -->
+  <path d="M175,95 Q245,88 315,95 Q320,140 315,175 Q245,182 175,175 Q170,140 175,95Z" fill="rgba(85,239,196,0.12)" stroke="#55efc4" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <!-- Heart -->
+  <path d="M245,125 Q255,118 262,126 Q268,136 260,145 Q253,152 245,158 Q237,152 230,145 Q222,136 228,126 Q235,118 245,125Z" fill="rgba(220,60,60,0.4)" stroke="#e05050" stroke-width="1.5"/>
+  <!-- Lungs -->
+  <path d="M185,100 Q192,120 190,150 Q205,160 218,155 Q220,130 218,100Z" fill="rgba(150,120,255,0.2)" stroke="#a29bfe" stroke-width="1"/>
+  <path d="M305,100 Q298,120 300,150 Q285,160 272,155 Q270,130 272,100Z" fill="rgba(150,120,255,0.2)" stroke="#a29bfe" stroke-width="1"/>
+  <!-- Diaphragm -->
+  <path d="M175,178 Q210,192 245,190 Q280,192 315,178" fill="none" stroke="#fd79a8" stroke-width="3" stroke-linecap="round"/>
+  <!-- Abdominal cavity -->
+  <path d="M176,185 Q245,195 314,185 Q316,240 314,278 Q245,285 176,278 Q174,240 176,185Z" fill="rgba(253,203,110,0.1)" stroke="#fdcb6e" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <!-- Liver -->
+  <path d="M260,205 Q285,200 295,215 Q298,230 288,238 Q272,242 260,236 Q254,225 260,205Z" fill="rgba(180,80,60,0.35)" stroke="rgba(200,100,80,0.5)" stroke-width="1"/>
+  <!-- Stomach -->
+  <path d="M210,205 Q228,198 238,210 Q242,225 236,236 Q222,240 210,232 Q204,220 210,205Z" fill="rgba(200,160,80,0.25)" stroke="rgba(220,180,100,0.4)" stroke-width="1"/>
+  <!-- Pelvic cavity -->
+  <path d="M178,282 Q245,292 312,282 Q310,330 295,360 Q270,378 245,380 Q220,378 195,360 Q180,330 178,282Z" fill="rgba(253,121,168,0.1)" stroke="#fd79a8" stroke-width="1.5" stroke-dasharray="4,2"/>
+  <!-- Labels right -->
+  <line x1="278" y1="22" x2="360" y2="40" stroke="rgba(162,155,254,0.5)" stroke-width="1"/>
+  <text x="362" y="38" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#a29bfe">Cranial 두개강</text>
+  <line x1="315" y1="135" x2="360" y2="110" stroke="rgba(85,239,196,0.5)" stroke-width="1"/>
+  <text x="362" y="108" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#55efc4">Thoracic 흉강</text>
+  <line x1="300" y1="235" x2="360" y2="200" stroke="rgba(253,203,110,0.5)" stroke-width="1"/>
+  <text x="362" y="198" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#fdcb6e">Abdominal 복강</text>
+  <line x1="295" y1="320" x2="360" y2="290" stroke="rgba(253,121,168,0.5)" stroke-width="1"/>
+  <text x="362" y="288" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#fd79a8">Pelvic 골반강</text>
+  <line x1="245" y1="188" x2="130" y2="195" stroke="rgba(253,121,168,0.4)" stroke-width="1"/>
+  <text x="30" y="193" font-family="DM Sans,sans-serif" font-size="10" fill="#fd79a8">Diaphragm</text>
+  <text x="40" y="205" font-family="DM Sans,sans-serif" font-size="10" fill="#fd79a8">횡격막</text>
+  <text x="240" y="414" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.3)">신체 공강 · Body Cavities (thorac/o, abdomin/o)</text>
+</svg>`
+  },
+  {
+    id:'fig2-3',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'복부 구역 · Abdominopelvic Regions',
+    title:'Figure 2-3 · Abdominal Quadrants',
+    desc:{ ko:'복부 4분면 — RUQ, LUQ, RLQ, LLQ와 주요 장기 위치', en:'Abdominal quadrants — RUQ, LUQ, RLQ, LLQ with key organ locations', es:'Cuadrantes abdominales y órganos principales' },
+    svg:`<svg viewBox="0 0 440 380" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <rect width="440" height="380" fill="#1e1a14"/>
+  <!-- Abdomen outline -->
+  <ellipse cx="200" cy="195" rx="155" ry="165" fill="rgba(15,15,30,0.9)" stroke="#2a2a45" stroke-width="2"/>
+  <!-- Quadrant dividers -->
+  <line x1="200" y1="40" x2="200" y2="360" stroke="#3a3a60" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <line x1="52" y1="195" x2="350" y2="195" stroke="#3a3a60" stroke-width="2.5" stroke-dasharray="6,3"/>
+  <!-- Umbilicus -->
+  <circle cx="200" cy="195" r="6" fill="none" stroke="#6c5ce7" stroke-width="2"/>
+  <!-- Liver RUQ -->
+  <path d="M215,80 Q265,72 290,90 Q305,115 295,140 Q275,150 248,145 Q225,140 215,120Z" fill="rgba(180,70,50,0.35)" stroke="rgba(200,90,70,0.6)" stroke-width="1.5"/>
+  <text x="248" y="115" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(220,120,100,0.8)">Liver 간</text>
+  <!-- Gallbladder -->
+  <ellipse cx="285" cy="152" rx="10" ry="7" fill="rgba(100,180,80,0.3)" stroke="rgba(120,200,100,0.5)" stroke-width="1"/>
+  <!-- Stomach LUQ -->
+  <path d="M140,80 Q175,70 195,88 Q200,115 190,138 Q165,145 145,132 Q130,112 140,80Z" fill="rgba(200,160,60,0.25)" stroke="rgba(220,180,80,0.5)" stroke-width="1.5"/>
+  <text x="165" y="113" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(220,180,100,0.8)">Stomach 위</text>
+  <!-- Spleen LUQ -->
+  <ellipse cx="110" cy="110" rx="22" ry="16" fill="rgba(108,92,231,0.25)" stroke="rgba(130,110,240,0.5)" stroke-width="1.5"/>
+  <text x="110" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(162,155,254,0.8)">Spleen 비장</text>
+  <!-- Large intestine / colon (rough) -->
+  <path d="M290,160 Q310,180 308,210 Q305,240 285,255" fill="none" stroke="rgba(255,190,80,0.4)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M285,255 Q250,270 200,270 Q155,270 118,255" fill="none" stroke="rgba(255,190,80,0.4)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M118,255 Q95,240 90,210 Q88,180 112,160" fill="none" stroke="rgba(255,190,80,0.4)" stroke-width="8" stroke-linecap="round"/>
+  <!-- Appendix RLQ -->
+  <line x1="290" y1="255" x2="308" y2="280" stroke="rgba(255,100,100,0.5)" stroke-width="3" stroke-linecap="round"/>
+  <!-- Kidneys (bilateral, slightly posterior) -->
+  <ellipse cx="138" cy="155" rx="14" ry="20" fill="rgba(200,100,60,0.2)" stroke="rgba(220,120,80,0.4)" stroke-width="1.5"/>
+  <ellipse cx="264" cy="155" rx="14" ry="20" fill="rgba(200,100,60,0.2)" stroke="rgba(220,120,80,0.4)" stroke-width="1.5"/>
+  <!-- Quadrant labels -->
+  <text x="285" y="70" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#fdcb6e">RUQ</text>
+  <text x="285" y="83" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(253,203,110,0.6)">우상복부</text>
+  <text x="110" y="70" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#55efc4">LUQ</text>
+  <text x="110" y="83" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(85,239,196,0.6)">좌상복부</text>
+  <text x="285" y="310" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#fd79a8">RLQ</text>
+  <text x="285" y="323" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(253,121,168,0.6)">우하복부</text>
+  <text x="100" y="310" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#a29bfe">LLQ</text>
+  <text x="100" y="323" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(162,155,254,0.6)">좌하복부</text>
+  <!-- Side labels -->
+  <text x="370" y="140" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(220,120,80,0.7)">Liver/GB</text>
+  <line x1="296" y1="115" x2="368" y2="135" stroke="rgba(220,100,80,0.3)" stroke-width="1"/>
+  <text x="370" y="280" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,100,100,0.7)">Appendix</text>
+  <text x="370" y="292" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(255,100,100,0.5)">충수</text>
+  <line x1="308" y1="278" x2="368" y2="275" stroke="rgba(255,100,100,0.3)" stroke-width="1"/>
+  <text x="220" y="370" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="rgba(255,255,255,0.3)">복부 4분면 · Abdominal Quadrants</text>
+</svg>`
+  },
+  {
+    id:'fig2-4',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'척주 구분 · Divisions of the Back',
+    title:'Figure 2-4 · Spinal Column Divisions',
+    desc:{ ko:'척주 5개 구역 — 경추(C), 흉추(T), 요추(L), 천골(S), 미골', en:'5 divisions of the spinal column — cervical, thoracic, lumbar, sacral, coccygeal', es:'5 divisiones de la columna vertebral' },
+    svg:`<svg viewBox="0 0 480 440" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <defs>
+    <linearGradient id="spineGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e1a14"/>
+      <stop offset="100%" stop-color="#2a2218"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="440" fill="#1e1a14"/>
+  <!-- Title -->
+  <text x="240" y="28" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" font-weight="700" fill="#f5f0e8">척주 구분 · Spinal Column Divisions</text>
+
+  <!-- Spine outline -->
+  <rect x="195" y="44" width="34" height="352" rx="4" fill="rgba(200,191,170,0.08)" stroke="rgba(200,191,170,0.2)" stroke-width="1"/>
+
+  <!-- CERVICAL C1-C7 -->
+  <g>
+    <rect x="193" y="46" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.9"/>
+    <rect x="193" y="55" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.85"/>
+    <rect x="193" y="64" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.8"/>
+    <rect x="193" y="73" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.75"/>
+    <rect x="193" y="82" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.7"/>
+    <rect x="193" y="91" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.65"/>
+    <rect x="193" y="100" width="38" height="7" rx="2" fill="#7c9cbc" opacity="0.6"/>
+    <!-- Label -->
+    <line x1="193" y1="75" x2="150" y2="75" stroke="#7c9cbc" stroke-width="1.5"/>
+    <text x="145" y="66" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#7c9cbc" text-anchor="end">C</text>
+    <text x="145" y="81" font-family="DM Sans,sans-serif" font-size="10" fill="#7c9cbc" text-anchor="end">Cervical</text>
+    <text x="145" y="93" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(124,156,188,0.7)" text-anchor="end">경추 C1–C7</text>
+    <text x="145" y="105" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(124,156,188,0.55)" text-anchor="end">목 (Neck)</text>
+  </g>
+
+  <!-- THORACIC T1-T12 -->
+  <g>
+    <rect x="191" y="110" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.9"/>
+    <rect x="191" y="119" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.87"/>
+    <rect x="191" y="128" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.84"/>
+    <rect x="191" y="137" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.81"/>
+    <rect x="191" y="146" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.78"/>
+    <rect x="191" y="155" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.75"/>
+    <rect x="191" y="164" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.72"/>
+    <rect x="191" y="173" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.69"/>
+    <rect x="191" y="182" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.66"/>
+    <rect x="191" y="191" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.63"/>
+    <rect x="191" y="200" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.6"/>
+    <rect x="191" y="209" width="42" height="7" rx="2" fill="#6ca87a" opacity="0.57"/>
+    <line x1="191" y1="163" x2="150" y2="163" stroke="#6ca87a" stroke-width="1.5"/>
+    <text x="145" y="154" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#6ca87a" text-anchor="end">T</text>
+    <text x="145" y="169" font-family="DM Sans,sans-serif" font-size="10" fill="#6ca87a" text-anchor="end">Thoracic</text>
+    <text x="145" y="181" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(108,168,122,0.7)" text-anchor="end">흉추 T1–T12</text>
+    <text x="145" y="193" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(108,168,122,0.55)" text-anchor="end">가슴 (Chest)</text>
+  </g>
+
+  <!-- LUMBAR L1-L5 -->
+  <g>
+    <rect x="190" y="220" width="44" height="9" rx="2" fill="#c8922a" opacity="0.9"/>
+    <rect x="190" y="231" width="44" height="9" rx="2" fill="#c8922a" opacity="0.85"/>
+    <rect x="190" y="242" width="44" height="9" rx="2" fill="#c8922a" opacity="0.8"/>
+    <rect x="190" y="253" width="44" height="9" rx="2" fill="#c8922a" opacity="0.75"/>
+    <rect x="190" y="264" width="44" height="9" rx="2" fill="#c8922a" opacity="0.7"/>
+    <line x1="190" y1="248" x2="150" y2="248" stroke="#c8922a" stroke-width="1.5"/>
+    <text x="145" y="240" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#c8922a" text-anchor="end">L</text>
+    <text x="145" y="255" font-family="DM Sans,sans-serif" font-size="10" fill="#c8922a" text-anchor="end">Lumbar</text>
+    <text x="145" y="267" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(200,146,42,0.7)" text-anchor="end">요추 L1–L5</text>
+    <text x="145" y="279" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(200,146,42,0.55)" text-anchor="end">허리 (Lower back)</text>
+  </g>
+
+  <!-- SACRAL S1-S5 fused -->
+  <g>
+    <rect x="189" y="277" width="46" height="44" rx="4" fill="rgba(192,57,43,0.35)" stroke="#c0392b" stroke-width="1.5"/>
+    <text x="212" y="302" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="#c0392b">S1–S5</text>
+    <text x="212" y="314" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(192,57,43,0.7)">fused</text>
+    <line x1="235" y1="299" x2="270" y2="299" stroke="#c0392b" stroke-width="1.5"/>
+    <text x="275" y="291" font-family="Space Mono,monospace" font-size="13" font-weight="700" fill="#c0392b">S</text>
+    <text x="275" y="306" font-family="DM Sans,sans-serif" font-size="10" fill="#c0392b">Sacral</text>
+    <text x="275" y="318" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(192,57,43,0.7)">천골 S1–S5</text>
+    <text x="275" y="330" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(192,57,43,0.55)">융합된 뼈</text>
+  </g>
+
+  <!-- COCCYX -->
+  <g>
+    <rect x="197" y="325" width="30" height="18" rx="4" fill="rgba(162,155,254,0.25)" stroke="#a29bfe" stroke-width="1.5"/>
+    <text x="212" y="338" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="#a29bfe">4 fused</text>
+    <line x1="235" y1="334" x2="270" y2="334" stroke="#a29bfe" stroke-width="1.5"/>
+    <text x="275" y="327" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#a29bfe">Coccyx</text>
+    <text x="275" y="340" font-family="DM Sans,sans-serif" font-size="10" fill="#a29bfe">미골 (꼬리뼈)</text>
+  </g>
+
+  <!-- Memory tips -->
+  <rect x="30" y="360" width="420" height="68" rx="8" fill="rgba(124,92,46,0.12)" stroke="rgba(124,92,46,0.3)" stroke-width="1"/>
+  <text x="45" y="378" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#7c5c2e">💡 암기 팁</text>
+  <text x="45" y="393" font-family="DM Sans,sans-serif" font-size="11" fill="#6a5c48">C7 → T12 → L5 → S5 → Coccyx(4)</text>
+  <text x="45" y="407" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(106,92,72,0.7)">경추7개 · 흉추12개(갈비뼈 연결) · 요추5개 · 천골5개융합 · 미골4개융합</text>
+  <text x="45" y="420" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(106,92,72,0.55)">Disc herniation은 주로 L4–L5 또는 L5–S1 사이에서 발생</text>
+</svg>`
+  },
+  {
+    id:'fig2-5',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'방향 용어 · Positional and Directional Terms',
+    title:'Figure 2-5 · Directional Terms',
+    desc:{ ko:'신체 방향 용어 — 전방/후방, 상/하, 내측/외측, 근위/원위, 앙와위/복와위', en:'Body directional terms — anterior/posterior, superior/inferior, medial/lateral, proximal/distal, supine/prone', es:'Términos direccionales del cuerpo' },
+    svg:`<svg viewBox="0 0 560 440" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <rect width="560" height="440" fill="#1e1a14"/>
+  <text x="280" y="26" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" font-weight="700" fill="#f5f0e8">방향 용어 · Directional Terms</text>
+
+  <!-- Body silhouette -->
+  <ellipse cx="220" cy="68" rx="28" ry="32" fill="rgba(200,191,170,0.12)" stroke="rgba(200,191,170,0.35)" stroke-width="1.5"/>
+  <path d="M200,98 Q196,120 195,160 Q194,200 196,240 Q198,270 195,310 Q218,318 220,318 Q222,318 245,310 Q242,270 244,240 Q246,200 245,160 Q244,120 240,98 Z" fill="rgba(200,191,170,0.12)" stroke="rgba(200,191,170,0.35)" stroke-width="1.5"/>
+  <path d="M196,120 Q170,130 160,160 Q165,175 185,170 Q192,148 196,138" fill="rgba(200,191,170,0.08)" stroke="rgba(200,191,170,0.25)" stroke-width="1"/>
+  <path d="M244,120 Q270,130 280,160 Q275,175 255,170 Q248,148 244,138" fill="rgba(200,191,170,0.08)" stroke="rgba(200,191,170,0.25)" stroke-width="1"/>
+  <path d="M205,310 Q202,360 200,390" fill="none" stroke="rgba(200,191,170,0.3)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M235,310 Q238,360 240,390" fill="none" stroke="rgba(200,191,170,0.3)" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- SUPERIOR / INFERIOR axis -->
+  <line x1="220" y1="36" x2="220" y2="420" stroke="rgba(108,168,122,0.2)" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="220" y="14" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#6ca87a">SUPERIOR</text>
+  <text x="220" y="434" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6ca87a">INFERIOR · 하위</text>
+  <text x="220" y="422" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#6ca87a">▼</text>
+
+  <!-- ANTERIOR label (front) -->
+  <rect x="60" y="140" width="100" height="44" rx="6" fill="rgba(124,92,46,0.15)" stroke="rgba(124,92,46,0.4)" stroke-width="1"/>
+  <text x="110" y="158" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#7c5c2e">ANTERIOR</text>
+  <text x="110" y="171" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#7c5c2e">Ventral · 전방</text>
+  <text x="110" y="183" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(124,92,46,0.6)">앞면/배쪽</text>
+  <line x1="160" y1="162" x2="192" y2="162" stroke="rgba(124,92,46,0.5)" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- POSTERIOR label (back) -->
+  <rect x="282" y="140" width="104" height="44" rx="6" fill="rgba(108,92,231,0.1)" stroke="rgba(108,92,231,0.35)" stroke-width="1"/>
+  <text x="334" y="158" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#6c5ce7">POSTERIOR</text>
+  <text x="334" y="171" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#6c5ce7">Dorsal · 후방</text>
+  <text x="334" y="183" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(108,92,231,0.6)">뒷면/등쪽</text>
+  <line x1="282" y1="162" x2="252" y2="162" stroke="rgba(108,92,231,0.5)" stroke-width="1.5"/>
+
+  <!-- MEDIAL / LATERAL -->
+  <text x="140" y="220" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" font-weight="700" fill="#c0392b">LATERAL</text>
+  <text x="140" y="233" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#c0392b">외측 · 옆</text>
+  <line x1="160" y1="226" x2="194" y2="220" stroke="rgba(192,57,43,0.5)" stroke-width="1.5"/>
+
+  <text x="300" y="220" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" font-weight="700" fill="#c0392b">LATERAL</text>
+  <text x="300" y="233" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#c0392b">외측</text>
+  <line x1="248" y1="220" x2="280" y2="226" stroke="rgba(192,57,43,0.5)" stroke-width="1.5"/>
+
+  <text x="220" y="218" text-anchor="middle" font-family="Space Mono,monospace" font-size="10" font-weight="700" fill="#fdcb6e">MEDIAL</text>
+  <text x="220" y="230" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#fdcb6e">내측 · 중간</text>
+
+  <!-- PROXIMAL / DISTAL on arm -->
+  <text x="148" y="132" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" font-weight="700" fill="#00cec9">PROXIMAL</text>
+  <text x="148" y="143" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="#00cec9">근위 (몸통 가까운쪽)</text>
+  <line x1="168" y1="138" x2="182" y2="140" stroke="rgba(0,206,201,0.5)" stroke-width="1.5"/>
+
+  <text x="108" y="168" text-anchor="start" font-family="Space Mono,monospace" font-size="9" font-weight="700" fill="#00cec9">DISTAL</text>
+  <text x="108" y="179" text-anchor="start" font-family="DM Sans,sans-serif" font-size="8" fill="#00cec9">원위 (몸통 먼쪽)</text>
+  <line x1="148" y1="174" x2="163" y2="168" stroke="rgba(0,206,201,0.5)" stroke-width="1.5"/>
+
+  <!-- DEEP / SUPERFICIAL indicator -->
+  <circle cx="220" cy="185" r="18" fill="none" stroke="rgba(253,203,110,0.4)" stroke-width="1" stroke-dasharray="3,2"/>
+  <circle cx="220" cy="185" r="8" fill="rgba(253,203,110,0.15)" stroke="rgba(253,203,110,0.6)" stroke-width="1.5"/>
+  <text x="350" y="195" font-family="Space Mono,monospace" font-size="9" font-weight="700" fill="#fdcb6e">DEEP · 심부</text>
+  <text x="350" y="207" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(253,203,110,0.7)">표면에서 먼 쪽</text>
+  <text x="350" y="220" font-family="Space Mono,monospace" font-size="9" font-weight="700" fill="rgba(253,203,110,0.6)">SUPERFICIAL</text>
+  <text x="350" y="232" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(253,203,110,0.5)">표면에 가까운 쪽</text>
+  <line x1="252" y1="188" x2="348" y2="200" stroke="rgba(253,203,110,0.3)" stroke-width="1" stroke-dasharray="3,2"/>
+
+  <!-- SUPINE / PRONE bottom diagrams -->
+  <rect x="30" y="340" width="230" height="86" rx="8" fill="rgba(108,168,122,0.08)" stroke="rgba(108,168,122,0.3)" stroke-width="1"/>
+  <text x="145" y="358" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#6ca87a">SUPINE · 앙와위</text>
+  <text x="145" y="371" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(108,168,122,0.8)">등을 대고 누운 자세</text>
+  <!-- supine figure -->
+  <ellipse cx="95" cy="400" rx="10" ry="12" fill="rgba(200,191,170,0.2)" stroke="rgba(200,191,170,0.4)" stroke-width="1"/>
+  <rect x="86" y="411" width="18" height="8" rx="3" fill="rgba(200,191,170,0.15)" stroke="rgba(200,191,170,0.35)" stroke-width="1"/>
+  <text x="95" y="418" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7" fill="rgba(200,191,170,0.5)">face↑</text>
+  <text x="145" y="418" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(108,168,122,0.6)">검사 시 기본 자세</text>
+
+  <rect x="300" y="340" width="230" height="86" rx="8" fill="rgba(192,57,43,0.08)" stroke="rgba(192,57,43,0.25)" stroke-width="1"/>
+  <text x="415" y="358" text-anchor="middle" font-family="Space Mono,monospace" font-size="11" font-weight="700" fill="#c0392b">PRONE · 복와위</text>
+  <text x="415" y="371" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(192,57,43,0.8)">배를 대고 엎드린 자세</text>
+  <ellipse cx="365" cy="400" rx="10" ry="12" fill="rgba(200,191,170,0.2)" stroke="rgba(200,191,170,0.4)" stroke-width="1"/>
+  <rect x="356" y="411" width="18" height="8" rx="3" fill="rgba(200,191,170,0.15)" stroke="rgba(200,191,170,0.35)" stroke-width="1"/>
+  <text x="365" y="418" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7" fill="rgba(200,191,170,0.5)">face↓</text>
+  <text x="415" y="418" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(192,57,43,0.6)">척추 검사 시 자세</text>
+</svg>`
+  },
+  {
+    id:'fig2-6',
+    chapter:2,
+    chapterTitle:'Chapter 2: Terms Pertaining to the Body as a Whole',
+    section:'신체 단면 · Planes of the Body',
+    title:'Figure 2-6 · Body Planes',
+    desc:{ ko:'신체 3개 단면 — 관상면(전후), 시상면(좌우), 횡단면(상하)', en:'3 body planes — frontal/coronal, sagittal/lateral, transverse/axial', es:'3 planos del cuerpo' },
+    svg:`<svg viewBox="0 0 560 400" xmlns="http://www.w3.org/2000/svg" class="fig-svg">
+  <rect width="560" height="400" fill="#1e1a14"/>
+  <text x="280" y="26" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="14" font-weight="700" fill="#f5f0e8">신체 단면 · Body Planes</text>
+
+  <!-- FRONTAL PLANE card -->
+  <rect x="20" y="42" width="160" height="310" rx="10" fill="rgba(108,92,231,0.08)" stroke="rgba(108,92,231,0.4)" stroke-width="1.5"/>
+  <text x="100" y="62" text-anchor="middle" font-family="Space Mono,monospace" font-size="12" font-weight="700" fill="#a29bfe">FRONTAL</text>
+  <text x="100" y="77" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#a29bfe">Coronal Plane</text>
+  <text x="100" y="90" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(162,155,254,0.7)">관상면</text>
+  <!-- frontal body -->
+  <ellipse cx="100" cy="130" rx="22" ry="26" fill="rgba(200,191,170,0.1)" stroke="rgba(162,155,254,0.5)" stroke-width="1.5"/>
+  <rect x="78" y="154" width="44" height="80" rx="4" fill="rgba(200,191,170,0.08)" stroke="rgba(162,155,254,0.4)" stroke-width="1.5"/>
+  <!-- vertical dividing line (frontal cuts front/back) -->
+  <line x1="100" y1="44" x2="100" y2="310" stroke="#a29bfe" stroke-width="2.5" stroke-dasharray="6,3" opacity="0.7"/>
+  <text x="100" y="258" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(162,155,254,0.8)">전방 ↔ 후방</text>
+  <text x="100" y="270" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(162,155,254,0.7)">Anterior ↔ Posterior</text>
+  <text x="100" y="290" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(162,155,254,0.6)">흉부 PA X-ray</text>
+  <text x="100" y="302" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(162,155,254,0.5)">이 단면으로 촬영</text>
+  <text x="100" y="342" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(162,155,254,0.4)">세로 수직면</text>
+
+  <!-- SAGITTAL PLANE card -->
+  <rect x="200" y="42" width="160" height="310" rx="10" fill="rgba(0,206,201,0.07)" stroke="rgba(0,206,201,0.4)" stroke-width="1.5"/>
+  <text x="280" y="62" text-anchor="middle" font-family="Space Mono,monospace" font-size="12" font-weight="700" fill="#00cec9">SAGITTAL</text>
+  <text x="280" y="77" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#00cec9">Lateral Plane</text>
+  <text x="280" y="90" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(0,206,201,0.7)">시상면</text>
+  <!-- sagittal body -->
+  <ellipse cx="280" cy="130" rx="22" ry="26" fill="rgba(200,191,170,0.1)" stroke="rgba(0,206,201,0.4)" stroke-width="1.5"/>
+  <rect x="258" y="154" width="44" height="80" rx="4" fill="rgba(200,191,170,0.08)" stroke="rgba(0,206,201,0.35)" stroke-width="1.5"/>
+  <!-- sagittal: left/right divide -->
+  <line x1="280" y1="44" x2="280" y2="310" stroke="#00cec9" stroke-width="2.5" opacity="0.7"/>
+  <!-- show right/left split -->
+  <text x="264" y="200" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(0,206,201,0.6)">R</text>
+  <text x="289" y="200" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(0,206,201,0.6)">L</text>
+  <text x="280" y="258" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(0,206,201,0.8)">우측 ↔ 좌측</text>
+  <text x="280" y="270" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(0,206,201,0.7)">Right ↔ Left</text>
+  <text x="280" y="290" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(0,206,201,0.6)">측면 흉부 X-ray</text>
+  <text x="280" y="302" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(0,206,201,0.5)">이 단면으로 촬영</text>
+  <text x="280" y="342" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(0,206,201,0.4)">Midsagittal = 정중선</text>
+
+  <!-- TRANSVERSE PLANE card -->
+  <rect x="380" y="42" width="160" height="310" rx="10" fill="rgba(253,203,110,0.07)" stroke="rgba(253,203,110,0.4)" stroke-width="1.5"/>
+  <text x="460" y="62" text-anchor="middle" font-family="Space Mono,monospace" font-size="12" font-weight="700" fill="#fdcb6e">TRANSVERSE</text>
+  <text x="460" y="77" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="#fdcb6e">Axial Plane</text>
+  <text x="460" y="90" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(253,203,110,0.7)">횡단면</text>
+  <!-- transverse body -->
+  <ellipse cx="460" cy="130" rx="22" ry="26" fill="rgba(200,191,170,0.1)" stroke="rgba(253,203,110,0.4)" stroke-width="1.5"/>
+  <rect x="438" y="154" width="44" height="80" rx="4" fill="rgba(200,191,170,0.08)" stroke="rgba(253,203,110,0.35)" stroke-width="1.5"/>
+  <!-- horizontal cut -->
+  <line x1="382" y1="194" x2="538" y2="194" stroke="#fdcb6e" stroke-width="2.5" opacity="0.7"/>
+  <text x="412" y="190" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(253,203,110,0.6)">upper</text>
+  <text x="412" y="208" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(253,203,110,0.6)">lower</text>
+  <text x="460" y="258" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(253,203,110,0.8)">상부 ↔ 하부</text>
+  <text x="460" y="270" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(253,203,110,0.7)">Superior ↔ Inferior</text>
+  <text x="460" y="290" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="rgba(253,203,110,0.6)">CT 스캔</text>
+  <text x="460" y="302" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" fill="rgba(253,203,110,0.5)">이 단면으로 촬영</text>
+  <text x="460" y="342" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(253,203,110,0.4)">수평 횡단면</text>
+
+  <!-- bottom summary -->
+  <text x="280" y="378" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" fill="rgba(245,240,232,0.5)">관상면(전후분리) · 시상면(좌우분리) · 횡단면(상하분리)</text>
+</svg>`
+  },
+];
+
+// ============================================================
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+const SUPA_URL = 'https://argikcxgrrjhhcdrxonv.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFyZ2lrY3hncnJqaGhjZHJ4b252Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMzI0MjgsImV4cCI6MjA5MTYwODQyOH0.DvUZqr6O2-Dem68KZnToHmCkPLJ5l6IQAA2ctD_qLWA';
+
+async function supaFetch(method, path, body) {
+  const res = await fetch(SUPA_URL + '/rest/v1/' + path, {
+    method,
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': method === 'POST' ? 'return=representation' : ''
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  if (!res.ok) { const e = await res.text(); throw new Error(e); }
+  return method === 'DELETE' ? null : res.json();
+}
+
+// ============================================================
+// PHOTO CARDS (Supabase)
+// ============================================================
+let photoCards = [];
+
+async function loadPhotos() {
+  try {
+    showPhotoLoading(true);
+    const data = await supaFetch('GET', 'medterm_photos?select=*&order=created_at.asc');
+    photoCards = data || [];
+    renderPhotoGrid();
+  } catch(e) {
+    console.error('loadPhotos error:', e);
+    // Fallback to localStorage
+    try { photoCards = JSON.parse(localStorage.getItem('medterm_photos') || '[]'); } catch(_) {}
+    renderPhotoGrid();
+  } finally {
+    showPhotoLoading(false);
+  }
+}
+
+async function savePhotoToSupabase(card) {
+  try {
+    const res = await supaFetch('POST', 'medterm_photos', {
+      src: card.src,
+      title: card.title || '',
+      notes: card.notes || ''
+    });
+    return res[0];
+  } catch(e) {
+    console.error('savePhoto error:', e);
+    return null;
+  }
+}
+
+async function deletePhotoFromSupabase(id) {
+  try {
+    await supaFetch('DELETE', 'medterm_photos?id=eq.' + id);
+  } catch(e) {
+    console.error('deletePhoto error:', e);
+  }
+}
+
+async function updatePhotoInSupabase(id, field, val) {
+  try {
+    await supaFetch('PATCH', 'medterm_photos?id=eq.' + id, { [field]: val });
+  } catch(e) {
+    console.error('updatePhoto error:', e);
+  }
+}
+
+function showPhotoLoading(show) {
+  const grid = document.getElementById('photoGrid');
+  if (show) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);font-size:13px">불러오는 중...</div>';
+  }
+}
+
+function updatePhotoStat() {
+  document.getElementById('statPhotos').textContent = photoCards.length;
+}
+
+function renderPhotoGrid() {
+  const grid = document.getElementById('photoGrid');
+  if (!photoCards.length) {
+    grid.innerHTML = `<div class="photo-empty">
+      <div class="empty-icon">📷</div>
+      <p>${t('photoEmpty')}<br><span style="color:var(--text-dim)">${t('photoEmptyDesc')}</span></p>
+    </div>`;
+    updatePhotoStat();
+    return;
+  }
+  grid.innerHTML = photoCards.map((card, idx) => `
+    <div class="photo-card" data-id="${card.id}" data-idx="${idx}">
+      <img class="photo-card-img" src="${card.src}" alt="photo card" data-src="${card.src}" data-title="${(card.title||'사진')}">
+      <div class="photo-card-body">
+        <div class="photo-card-title" contenteditable="true"
+          onblur="handlePhotoEdit(this, ${idx}, 'title')">${card.title || ''}</div>
+        <div class="photo-card-notes" contenteditable="true"
+          onblur="handlePhotoEdit(this, ${idx}, 'notes')">${card.notes || ''}</div>
+      </div>
+      <div class="photo-card-footer">
+        <button class="photo-delete-btn" onclick="deletePhoto(${idx})">${t('deleteCard')}</button>
+      </div>
+    </div>
+  `).join('');
+  updatePhotoStat();
+}
+
+function handlePhotoEdit(el, idx, field) {
+  const val = el.textContent.trim();
+  if (!photoCards[idx]) return;
+  photoCards[idx][field] = val;
+  const id = photoCards[idx].id;
+  if (id) updatePhotoInSupabase(id, field, val);
+}
+
+async function deletePhoto(idx) {
+  const card = photoCards[idx];
+  if (!card) return;
+  photoCards.splice(idx, 1);
+  renderPhotoGrid();
+  if (card.id) await deletePhotoFromSupabase(card.id);
+}
+
+function processImageFiles(files) {
+  if (!files.length) return;
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = async ev => {
+      const newCard = { src: ev.target.result, title: file.name.replace(/\.[^.]+$/, ''), notes: '', id: null };
+      // Save to Supabase first to get id
+      const saved = await savePhotoToSupabase(newCard);
+      if (saved) newCard.id = saved.id;
+      photoCards.push(newCard);
+      renderPhotoGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// Photo grid click delegation for modal
+document.getElementById('photoGrid').addEventListener('click', function(e) {
+  const img = e.target.closest('.photo-card-img');
+  if (img) openPhotoModal(img.dataset.src, img.dataset.title);
+});
+
+document.getElementById('photoFileInput').addEventListener('change', function(e) {
+  processImageFiles(Array.from(e.target.files));
+  this.value = '';
+});
+
+const dropZone = document.getElementById('photoDropZone');
+dropZone.addEventListener('click', () => document.getElementById('photoFileInput').click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+  processImageFiles(files);
+});
+
+// ============================================================
+// TERMS RENDERING
+// ============================================================
+let currentFilter = 'all';
+let currentChapter = 'all';
+let currentMode = 'list';
+let fcDeck = [], fcIndex = 0, fcFlipped = false;
+let quizScore = 0, quizTotal = 0, quizAnswered = false, quizCorrectIdx = -1;
+
+function getFilteredData() {
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  return DATA.filter(d => {
+    if (currentFilter !== 'all' && d.type !== currentFilter) return false;
+    if (currentChapter !== 'all' && String(d.chapter) !== currentChapter) return false;
+    if (!q) return true;
+    return d.term.toLowerCase().includes(q)
+      || d.ko.includes(q)
+      || d.en.toLowerCase().includes(q)
+      || (d.es && d.es.toLowerCase().includes(q))
+      || d.examples.some(ex => ex.en.toLowerCase().includes(q) || ex.ko.includes(q));
+  });
+}
+
+function getMeaningByLang(d) {
+  if (LANG === 'en') return d.en;
+  if (LANG === 'es') return d.es || d.en;
+  return d.ko;
+}
+
+function renderList() {
+  const data = getFilteredData();
+  document.getElementById('statTerms').textContent = DATA.length;
+  const view = document.getElementById('listView');
+  if (!data.length) { view.innerHTML = '<div style="color:var(--text-dim);padding:40px;text-align:center">검색 결과 없음</div>'; return; }
+  view.innerHTML = data.map((d, i) => {
+    const tagClass = `tag-${d.type}`;
+    const tagLabel = {combining:'결합형',suffix:'접미사',prefix:'접두사'}[d.type];
+    const meaning = getMeaningByLang(d);
+    const secMeaning = LANG === 'ko' ? d.en : d.ko;
+    const exHtml = d.examples.map(ex => `
+      <div class="example-row">
+        <span class="ex-term">${ex.en}</span>
+        <span class="ex-meaning">${ex.ko}${LANG==='es'&&ex.es?' / '+ex.es:''}</span>
+        <button class="speak-btn" onclick="speak('${ex.en.replace(/'/g,"\\'")}')" title="발음 듣기">🔊</button>
+      </div>`).join('');
+    return `<div class="term-card" style="animation-delay:${(i%10)*25}ms">
+      <div class="card-header">
+        <span class="type-tag ${tagClass}">${tagLabel}</span>
+        <div>
+          <div class="card-term">${d.term}</div>
+          <div class="card-pronun">${d.pronun}</div>
+        </div>
+        <button class="speak-btn" onclick="speak('${d.term.replace(/[/,]/g,' ').replace(/'/g,"\\'")}')" title="발음 듣기" style="margin-left:auto">🔊</button>
+      </div>
+      <div class="card-meaning">${meaning}<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${secMeaning}</span></div>
+      <div class="card-examples">${exHtml}</div>
+    </div>`;
+  }).join('');
+}
+
+function initFlashcard() {
+  fcDeck = [...getFilteredData()];
+  fcIndex = 0; fcFlipped = false;
+  renderFlashcard();
+}
+function renderFlashcard() {
+  if (!fcDeck.length) return;
+  const d = fcDeck[fcIndex];
+  const tagClass = `tag-${d.type}`;
+  const tagLabel = {combining:'결합형',suffix:'접미사',prefix:'접두사'}[d.type];
+  document.getElementById('fcTypeTag').className = `fc-type-tag ${tagClass}`;
+  document.getElementById('fcTypeTag').textContent = tagLabel;
+  document.getElementById('fcTypeTagBack').className = `fc-type-tag ${tagClass}`;
+  document.getElementById('fcTypeTagBack').textContent = tagLabel;
+  document.getElementById('fcTerm').textContent = d.term;
+  document.getElementById('fcMeaning').textContent = getMeaningByLang(d);
+  document.getElementById('fcPronun').textContent = d.pronun;
+  document.getElementById('fcExamples').innerHTML = d.examples.map(ex =>
+    `<div class="fc-ex-item"><div class="fc-ex-en">${ex.en}</div><div class="fc-ex-ko">${ex.ko}</div></div>`
+  ).join('');
+  const pct = fcDeck.length > 1 ? ((fcIndex/(fcDeck.length-1))*100) : 100;
+  document.getElementById('fcProgress').textContent = `${fcIndex+1} / ${fcDeck.length}`;
+  document.getElementById('fcProgressFill').style.width = pct + '%';
+  document.getElementById('flashcardInner').classList.remove('flipped');
+  fcFlipped = false;
+}
+function flipCard() {
+  fcFlipped = !fcFlipped;
+  document.getElementById('flashcardInner').classList.toggle('flipped', fcFlipped);
+}
+document.getElementById('flashcardStage').addEventListener('click', flipCard);
+document.getElementById('fcFlip').addEventListener('click', flipCard);
+document.getElementById('fcPrev').addEventListener('click', () => { if(fcIndex>0){fcIndex--;renderFlashcard();} });
+document.getElementById('fcNext').addEventListener('click', () => { if(fcIndex<fcDeck.length-1){fcIndex++;renderFlashcard();} });
+document.getElementById('fcShuffle').addEventListener('click', () => {
+  fcDeck.sort(()=>Math.random()-0.5); fcIndex=0; renderFlashcard();
+});
+document.getElementById('fcSpeakBtn').addEventListener('click', () => {
+  if(fcDeck[fcIndex]) speak(fcDeck[fcIndex].term);
+});
+
+function renderQuiz() {
+  const data = getFilteredData();
+  if (data.length < 4) { document.getElementById('quizOptions').innerHTML = '<p style="color:var(--text-dim)">퀴즈를 위해 4개 이상의 용어가 필요합니다.</p>'; return; }
+  const qIdx = Math.floor(Math.random()*data.length);
+  const correct = data[qIdx];
+  const wrongs = data.filter((_,i)=>i!==qIdx).sort(()=>Math.random()-0.5).slice(0,3);
+  const options = [...wrongs, correct].sort(()=>Math.random()-0.5);
+  quizCorrectIdx = options.indexOf(correct);
+  quizAnswered = false;
+  document.getElementById('quizTerm').textContent = correct.term;
+  document.getElementById('quizType').textContent = `(${{combining:'결합형',suffix:'접미사',prefix:'접두사'}[correct.type]})`;
+  document.getElementById('quizFeedback').textContent = '';
+  document.getElementById('quizNextBtn').classList.remove('show');
+  document.getElementById('quizOptions').innerHTML = options.map((o, i) => {
+    const meaning = getMeaningByLang(o);
+    return `<button class="quiz-option" data-idx="${i}" onclick="answerQuiz(${i},${quizCorrectIdx})">${i+1}. ${meaning}</button>`;
+  }).join('');
+}
+function answerQuiz(chosen, correct) {
+  if (quizAnswered) return;
+  quizAnswered = true; quizTotal++;
+  const opts = document.querySelectorAll('.quiz-option');
+  opts[correct].classList.add('correct');
+  if (chosen !== correct) {
+    opts[chosen].classList.add('wrong');
+    document.getElementById('quizFeedback').textContent = '오답!';
+  } else {
+    quizScore++;
+    document.getElementById('quizFeedback').textContent = '정답! ✅';
+  }
+  opts.forEach(b => b.disabled = true);
+  document.getElementById('quizScore').textContent = '✅ ' + quizScore;
+  document.getElementById('quizTotal').textContent = quizTotal;
+  document.getElementById('quizPercent').textContent = `정답률: ${Math.round((quizScore/quizTotal)*100)}%`;
+  document.getElementById('quizNextBtn').classList.add('show');
+}
+document.getElementById('quizNextBtn').addEventListener('click', renderQuiz);
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentMode = btn.dataset.mode;
+    document.getElementById('listView').classList.toggle('visible', currentMode==='list');
+    document.getElementById('flashcardView').classList.toggle('visible', currentMode==='flashcard');
+    document.getElementById('quizView').classList.toggle('visible', currentMode==='quiz');
+    if (currentMode==='flashcard') initFlashcard();
+    if (currentMode==='quiz') { quizScore=0; quizTotal=0; renderQuiz(); }
+    if (currentMode==='list') renderList();
+  });
+});
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    if (currentMode==='list') renderList();
+    else if (currentMode==='flashcard') initFlashcard();
+    else if (currentMode==='quiz') renderQuiz();
+  });
+});
+document.getElementById('searchBox').addEventListener('input', () => {
+  if (currentMode==='list') renderList();
+  else if (currentMode==='flashcard') initFlashcard();
+});
+
+document.querySelectorAll('.ch-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.ch-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentChapter = btn.dataset.chfilter;
+    if (currentMode==='list') renderList();
+    else if (currentMode==='flashcard') initFlashcard();
+    else if (currentMode==='quiz') renderQuiz();
+  });
+});
+
+// ============================================================
+// SPECIALISTS
+// ============================================================
+function renderSpecialists() {
+  const grid = document.getElementById('specialistGrid');
+  grid.innerHTML = SPECIALISTS.map((s, i) => {
+    const tagClass = `spec-tag-${s.type}`;
+    const tagLabel = {medical:'Internal Medicine',surgical:'Surgical',diagnostic:'Diagnostic'}[s.type];
+    const desc = s.desc[LANG] || s.desc.ko;
+    return `<div class="specialist-card" style="animation-delay:${i*35}ms">
+      <div class="spec-header">
+        <span class="spec-tag ${tagClass}">${tagLabel}</span>
+        <div>
+          <div class="spec-title">${s.title}</div>
+          <div class="spec-ko">${s.ko}${s.es?' · '+s.es:''}</div>
+          <div class="spec-pronun">${s.pronun}</div>
+        </div>
+        <button class="speak-btn" onclick="speak('${s.title}')" style="margin-left:auto">🔊</button>
+      </div>
+      <div class="spec-desc">${desc}</div>
+      <div class="spec-treats">${s.treats.map(tr=>`<span class="spec-treat-tag">${tr}</span>`).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// WARDS
+// ============================================================
+function renderWards() {
+  const content = document.getElementById('wardContent');
+  content.innerHTML = WARDS.map(section => {
+    const sectionTitle = section.section[LANG] || section.section.ko;
+    const items = section.items.map((item, i) => {
+      const desc = item.desc[LANG] || item.desc.ko;
+      return `<div class="ward-card" style="animation-delay:${i*25}ms">
+        ${item.abbr ? `<div class="ward-abbr">${item.abbr}</div>` : ''}
+        <div class="ward-en">${item.en}</div>
+        <div class="ward-ko">${item.ko}</div>
+        ${LANG==='es' ? `<div class="ward-es" style="display:block">${item.es||''}</div>` : ''}
+        <div class="ward-desc">${desc}</div>
+      </div>`;
+    }).join('');
+    return `<div class="ward-section">
+      <div class="ward-section-header">
+        <span class="ward-section-icon">${section.icon}</span>
+        <span class="ward-section-title">${sectionTitle}</span>
+      </div>
+      <div class="ward-grid">${items}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// FIGURES
+// ============================================================
+function renderFigures() {
+  const wrap = document.getElementById('figCardsWrap');
+  const chapters = {};
+  FIGURES.forEach(fig => {
+    const ch = fig.chapter || 1;
+    if (!chapters[ch]) chapters[ch] = { title: fig.chapterTitle || `Chapter ${ch}`, figs: [] };
+    chapters[ch].figs.push(fig);
+  });
+  wrap.innerHTML = Object.keys(chapters).sort().map(ch => {
+    const group = chapters[ch];
+    const figCards = group.figs.map(fig => {
+      const desc = fig.desc[LANG] || fig.desc.ko;
+      return `<div class="fig-card">
+        <div class="fig-chapter-badge">Ch.${ch} · ${fig.section||''}</div>
+        <div class="fig-diagram">${fig.svg}</div>
+        <div class="fig-info">
+          <div class="fig-title">${fig.title}</div>
+          <div class="fig-desc">${desc}</div>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="fig-chapter-group">
+      <div class="fig-chapter-header">
+        <span class="fig-ch-badge">Chapter ${ch}</span>
+        <span class="fig-ch-title">${group.title}</span>
+      </div>
+      <div class="fig-cards-wrap">${figCards}</div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// CHAPTER TAB SWITCHING
+// ============================================================
+document.querySelectorAll('.chapter-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.chapter-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.chapter-panel').forEach(p => p.classList.remove('visible'));
+    btn.classList.add('active');
+    const ch = btn.dataset.chapter;
+    const panelMap = { terms:'panelTerms', specialist:'panelSpecialist', ward:'panelWard', figures:'panelFigures', photos:'panelPhotos', mustknow:'panelMustknow' };
+    document.getElementById(panelMap[ch]).classList.add('visible');
+    if (ch==='specialist') renderSpecialists();
+    if (ch==='ward') renderWards();
+    if (ch==='figures') renderFigures();
+    if (ch==='photos') { if (!photoCards.length) loadPhotos(); else renderPhotoGrid(); }
+    if (ch==='mustknow') renderMustKnow();
+  });
+});
+
+// ============================================================
+// SPEECH
+// ============================================================
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.85;
+  window.speechSynthesis.speak(u);
+}
+
+document.addEventListener('keydown', e => {
+  if (currentMode==='flashcard') {
+    if (e.key===' '||e.key==='ArrowUp') { e.preventDefault(); flipCard(); }
+    if (e.key==='ArrowLeft' && fcIndex>0) { fcIndex--; renderFlashcard(); }
+    if (e.key==='ArrowRight' && fcIndex<fcDeck.length-1) { fcIndex++; renderFlashcard(); }
+  }
+  if (currentMode==='quiz') {
+    if (e.key==='Enter' && quizAnswered) renderQuiz();
+    const n=parseInt(e.key);
+    if (!quizAnswered && n>=1 && n<=4) {
+      const o=document.querySelectorAll('.quiz-option');
+      if(o[n-1]) o[n-1].click();
+    }
+  }
+});
+
+// ============================================================
+// AUTO PLAY
+// ============================================================
+let autoPlayActive = false;
+let autoPlayQueue = [];   // flat list of utterance objects {ko, en, label}
+let autoPlayIdx = 0;
+let autoPlayTimer = null;
+let apIncludeExamples = true;
+let apShuffle = false;
+
+// Option toggles
+document.getElementById('apOptExamples').addEventListener('click', function() {
+  apIncludeExamples = !apIncludeExamples;
+  this.classList.toggle('active', apIncludeExamples);
+});
+document.getElementById('apOptShuffle').addEventListener('click', function() {
+  apShuffle = !apShuffle;
+  this.classList.toggle('active', apShuffle);
+});
+
+function buildQueue() {
+  let deck = getFilteredData();
+  if (apShuffle) deck = [...deck].sort(() => Math.random() - 0.5);
+
+  const queue = [];
+  deck.forEach(d => {
+    // Main term: 한국어 뜻 → English term
+    queue.push({ ko: d.ko, en: d.term.replace(/[\/\-,]/g, ' ').trim(), label: '단어' });
+    // Examples: English word → Korean meaning
+    if (apIncludeExamples && d.examples) {
+      d.examples.forEach(ex => {
+        queue.push({ ko: ex.ko, en: ex.en, label: '예시' });
+      });
+    }
+  });
+  return queue;
+}
+
+function startAutoPlay() {
+  autoPlayQueue = buildQueue();
+  if (!autoPlayQueue.length) return;
+  autoPlayActive = true;
+  autoPlayIdx = 0;
+  document.getElementById('autoPlayBtn').textContent = '■ 중지';
+  document.getElementById('autoPlayBtn').classList.add('playing');
+  document.getElementById('autoPlayBar').classList.add('visible');
+  document.getElementById('autoPlayOptionsRow').classList.add('visible');
+  playNext();
+}
+
+function stopAutoPlay() {
+  autoPlayActive = false;
+  if (autoPlayTimer) clearTimeout(autoPlayTimer);
+  window.speechSynthesis.cancel();
+  document.getElementById('autoPlayBtn').textContent = '▶ 자동 읽기';
+  document.getElementById('autoPlayBtn').classList.remove('playing');
+  document.getElementById('autoPlayBar').classList.remove('visible');
+  document.getElementById('autoPlayOptionsRow').classList.remove('visible');
+  document.querySelectorAll('.term-card').forEach(c => c.style.outline = '');
+}
+
+function playNext() {
+  if (!autoPlayActive || autoPlayIdx >= autoPlayQueue.length) {
+    stopAutoPlay();
+    return;
+  }
+  const item = autoPlayQueue[autoPlayIdx];
+  document.getElementById('apLabel').textContent = item.label;
+  document.getElementById('apKo').textContent = item.ko;
+  document.getElementById('apEn').textContent = item.en;
+  document.getElementById('apProgress').textContent = `${autoPlayIdx + 1} / ${autoPlayQueue.length}`;
+
+  // Highlight card in list (only for 단어 items)
+  if (item.label === '단어') {
+    const cards = document.querySelectorAll('.term-card');
+    // Find which card index this term matches
+    const deck = getFilteredData();
+    const termIdx = deck.findIndex(d => d.ko === item.ko);
+    cards.forEach((c, i) => {
+      c.style.outline = i === termIdx ? '2px solid var(--accent)' : '';
+    });
+    if (cards[termIdx]) cards[termIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  window.speechSynthesis.cancel();
+
+  // Speak Korean first
+  const u1 = new SpeechSynthesisUtterance(item.ko);
+  u1.lang = 'ko-KR';
+  u1.rate = 0.85;
+  u1.onend = () => {
+    if (!autoPlayActive) return;
+    autoPlayTimer = setTimeout(() => {
+      if (!autoPlayActive) return;
+      // Speak English
+      const u2 = new SpeechSynthesisUtterance(item.en);
+      u2.lang = 'en-US';
+      u2.rate = 0.82;
+      u2.onend = () => {
+        if (!autoPlayActive) return;
+        const pause = item.label === '단어' ? 1000 : 600;
+        autoPlayTimer = setTimeout(() => {
+          autoPlayIdx++;
+          playNext();
+        }, pause);
+      };
+      window.speechSynthesis.speak(u2);
+    }, 350);
+  };
+  window.speechSynthesis.speak(u1);
+}
+
+document.getElementById('autoPlayBtn').addEventListener('click', () => {
+  if (autoPlayActive) stopAutoPlay();
+  else startAutoPlay();
+});
+document.getElementById('autoPlayStop').addEventListener('click', stopAutoPlay);
+
+// Show options row when hovering autoplay button area even before start
+document.getElementById('autoPlayBtn').addEventListener('mouseenter', () => {
+  if (!autoPlayActive) document.getElementById('autoPlayOptionsRow').classList.add('visible');
+});
+
+// Stop autoplay when switching modes/tabs
+document.querySelectorAll('.mode-btn, .chapter-tab').forEach(btn => {
+  btn.addEventListener('click', () => { if (autoPlayActive) stopAutoPlay(); });
+});
+
+// ============================================================
+// MUST KNOW DATA
+// ============================================================
+const MUSTKNOW = [
+  {
+    category: '⭐ 세포 구조 Cell Structure',
+    color: 'rgba(108,92,231,0.12)',
+    border: 'rgba(108,92,231,0.35)',
+    accent: '#a29bfe',
+    items: [
+      { term:'Cell membrane 세포막', note:'세포를 둘러싸고 보호 · 물질 통과 조절', hint:'세포의 "문"' },
+      { term:'Nucleus 핵', note:'세포의 조절 센터 · 염색체 포함 · 세포분열 지시', hint:'세포의 "뇌"' },
+      { term:'Chromosomes 염색체', note:'핵 안 막대형 구조 · DNA 포함 · 정상 인체세포 46개(23쌍)', hint:'정자·난자는 23개(미쌍)' },
+      { term:'DNA (Deoxyribonucleic acid)', note:'각 염색체 내 화학물질 · 세포 활동 지시 코드', hint:'"레시피 코드"' },
+      { term:'Cytoplasm 세포질', note:'핵 바깥, 세포막 안쪽 물질 · 세포의 실제 작업 수행', hint:'cyt/o = cell' },
+      { term:'Mitochondria 미토콘드리아', note:'세포의 주 에너지 공급원 · 이화작용(catabolism) 발생', hint:'"미토콘드리아 = 세포발전소"' },
+      { term:'Endoplasmic reticulum (ER) 소포체', note:'세포 내 통로망 · 단백질 합성 · 리보솜 부착', hint:'동화작용(anabolism) 장소' },
+      { term:'Anabolism 동화작용', note:'소분자(아미노산) → 대분자(단백질) 합성', hint:'ana- = 위로 build UP' },
+      { term:'Catabolism 이화작용', note:'복잡한 영양소 → 단순물질 + 에너지 방출', hint:'cata- = 아래로 break DOWN' },
+      { term:'Metabolism 신진대사', note:'동화작용 + 이화작용 = 세포의 모든 화학과정', hint:'meta- = change' },
+    ]
+  },
+  {
+    category: '⭐ 신체 공강 Body Cavities',
+    color: 'rgba(0,206,201,0.08)',
+    border: 'rgba(0,206,201,0.3)',
+    accent: '#00cec9',
+    items: [
+      { term:'Cranial cavity 두개강', note:'두개골 안 → 뇌, 뇌하수체', hint:'dorsal cavity' },
+      { term:'Thoracic cavity 흉강', note:'흉부 → 폐, 심장, 기관, 식도, 흉선', hint:'ventral cavity' },
+      { term:'Mediastinum 종격동', note:'흉강 내 폐 사이 공간 → 심장, 대동맥, 기관, 식도', hint:'medi/o = middle' },
+      { term:'Pleural cavity 흉막강', note:'각 폐를 둘러싼 공간 · 흉막(pleura)으로 싸임', hint:'pleural effusion = 흉막에 액체 고임' },
+      { term:'Abdominal cavity 복강', note:'복부 → 위, 간, 담낭, 췌장, 비장, 소·대장', hint:'peritoneal cavity라고도 함' },
+      { term:'Peritoneum 복막', note:'복부 장기 둘러싸는 이중막 · 장기를 근육에 고정', hint:'peri- = around' },
+      { term:'Pelvic cavity 골반강', note:'골반뼈 안 → 방광, 직장, 생식기관', hint:'복강과 연결 → abdominopelvic cavity' },
+      { term:'Spinal cavity 척수강', note:'척주 안 → 척수(spinal cord)', hint:'dorsal cavity (두개강과 연결)' },
+      { term:'Diaphragm 횡격막', note:'흉강과 복강을 나누는 근육벽', hint:'딸꾹질 = 횡격막 경련' },
+      { term:'Retroperitoneal 후복막', note:'복막 뒤쪽 공간 → 신장이 여기에 위치', hint:'retro- = behind' },
+    ]
+  },
+  {
+    category: '⭐ 복부 구역 Abdominopelvic',
+    color: 'rgba(253,203,110,0.08)',
+    border: 'rgba(253,203,110,0.3)',
+    accent: '#fdcb6e',
+    items: [
+      { term:'RUQ 우상복부', note:'간(우엽), 담낭, 췌장 일부, 소·대장 일부', hint:'Right Upper Quadrant' },
+      { term:'LUQ 좌상복부', note:'간(좌엽), 위, 비장, 췌장 일부', hint:'Left Upper Quadrant' },
+      { term:'RLQ 우하복부', note:'소·대장, 우측 난소·난관, 충수(appendix), 우측 요관', hint:'Right Lower Quadrant · 충수염 통증 위치!' },
+      { term:'LLQ 좌하복부', note:'소·대장, 좌측 난소·난관, 좌측 요관', hint:'Left Lower Quadrant' },
+      { term:'Epigastric region 상복부', note:'위장 위쪽 중앙 부위', hint:'epi- = above' },
+      { term:'Umbilical region 배꼽부위', note:'배꼽 주변 중앙 부위', hint:'umbilic/o = navel' },
+      { term:'Hypogastric region 하복부', note:'배꼽 아래 중앙 부위', hint:'hypo- = below' },
+      { term:'Hypochondriac region 늑연골하부', note:'좌우 상복부 · 갈비뼈 아래', hint:'chondr/o = cartilage' },
+      { term:'Inguinal (iliac) region 서혜부', note:'좌우 하복부 · 사타구니 근처', hint:'inguin/o = groin' },
+      { term:'Lumbar region 요부', note:'좌우 중간부위 · 허리 근처', hint:'lumb/o = lower back' },
+    ]
+  },
+  {
+    category: '⭐ 척주 구분 Spinal Column',
+    color: 'rgba(108,168,122,0.08)',
+    border: 'rgba(108,168,122,0.3)',
+    accent: '#6ca87a',
+    items: [
+      { term:'Cervical 경추 C1–C7', note:'목 부위 · 7개', hint:'C = Cervical · neck' },
+      { term:'Thoracic 흉추 T1–T12', note:'가슴 부위 · 12개 · 각 뼈가 갈비뼈에 연결', hint:'T = Thoracic · chest' },
+      { term:'Lumbar 요추 L1–L5', note:'허리 부위 · 5개 · 가장 큰 척추뼈', hint:'L = Lumbar · lower back' },
+      { term:'Sacral 천골 S1–S5', note:'5개 뼈가 융합된 하나의 뼈(sacrum)', hint:'S = Sacral · fused' },
+      { term:'Coccygeal 미골', note:'4개 뼈가 융합 · 꼬리뼈(coccyx)', hint:'tailbone' },
+      { term:'Disc herniation 추간판탈출증', note:'추간판이 탈출하여 신경 압박 · 주로 L4–L5 또는 L5–S1', hint:'"slipped disc"' },
+      { term:'Vertebra / Vertebrae', note:'단수: vertebra / 복수: vertebrae', hint:'척추뼈 하나 vs 여러개' },
+    ]
+  },
+  {
+    category: '⭐ 방향 용어 Directional Terms',
+    color: 'rgba(192,57,43,0.08)',
+    border: 'rgba(192,57,43,0.28)',
+    accent: '#c0392b',
+    items: [
+      { term:'Anterior (Ventral) 전방', note:'몸의 앞면', hint:'반대: Posterior' },
+      { term:'Posterior (Dorsal) 후방', note:'몸의 뒷면', hint:'반대: Anterior' },
+      { term:'Superior (Cephalic) 상위', note:'다른 구조물 위', hint:'반대: Inferior' },
+      { term:'Inferior 하위', note:'다른 구조물 아래', hint:'반대: Superior' },
+      { term:'Medial 내측', note:'몸의 중심선에 가까운', hint:'반대: Lateral' },
+      { term:'Lateral 외측', note:'몸의 측면 · 중심선에서 먼', hint:'반대: Medial' },
+      { term:'Proximal 근위', note:'몸통 부착점에 가까운', hint:'반대: Distal' },
+      { term:'Distal 원위', note:'몸통 부착점에서 먼', hint:'반대: Proximal' },
+      { term:'Superficial 표재성', note:'표면에 가까운', hint:'반대: Deep' },
+      { term:'Deep 심부', note:'표면에서 먼', hint:'반대: Superficial' },
+      { term:'Supine 앙와위', note:'등을 대고 누운 자세 (face up)', hint:'"Supine = on your Spine"' },
+      { term:'Prone 복와위', note:'배를 대고 엎드린 자세 (face down)', hint:'반대: Supine' },
+    ]
+  },
+  {
+    category: '⭐ 신체 단면 Body Planes',
+    color: 'rgba(162,155,254,0.08)',
+    border: 'rgba(162,155,254,0.3)',
+    accent: '#a29bfe',
+    items: [
+      { term:'Frontal (Coronal) plane 관상면', note:'수직면 · 신체를 전방/후방으로 나눔', hint:'흉부 PA X-ray = 관상면' },
+      { term:'Sagittal (Lateral) plane 시상면', note:'수직면 · 신체를 우측/좌측으로 나눔', hint:'측면 흉부 X-ray = 시상면' },
+      { term:'Midsagittal plane 정중시상면', note:'신체를 정확히 좌우 반으로 나눔', hint:'sagittal의 중간' },
+      { term:'Transverse (Axial) plane 횡단면', note:'수평면 · 신체를 상부/하부로 나눔', hint:'CT 스캔 = 횡단면' },
+    ]
+  },
+];
+
+function renderMustKnow() {
+  const el = document.getElementById('mustKnowContent');
+  // Use data-index approach to avoid inline string escaping issues
+  let html = '';
+  MUSTKNOW.forEach((cat, ci) => {
+    html += `<div class="mk-category" style="border-color:${cat.border};background:${cat.color}">`;
+    html += `<div class="mk-cat-title" style="color:${cat.accent}">${cat.category}</div>`;
+    html += `<div class="mk-grid">`;
+    cat.items.forEach((item, ii) => {
+      html += `<div class="mk-card" data-ci="${ci}" data-ii="${ii}">`;
+      html += `<div style="display:flex;align-items:flex-start;gap:6px">`;
+      html += `<div style="flex:1">`;
+      html += `<div class="mk-term" style="color:${cat.accent}">${item.term}</div>`;
+      html += `<div class="mk-note">${item.note}</div>`;
+      html += `<div class="mk-hint">💡 ${item.hint}</div>`;
+      html += `</div>`;
+      html += `<button class="speak-btn mk-speak-btn" data-ci="${ci}" data-ii="${ii}" title="읽기">🔊</button>`;
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  });
+  el.innerHTML = html;
+  // Attach speak listeners using data attributes (safe, no inline escaping)
+  el.querySelectorAll('.mk-speak-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const ci = parseInt(this.dataset.ci);
+      const ii = parseInt(this.dataset.ii);
+      const item = MUSTKNOW[ci].items[ii];
+      speakMkItem(item.term, item.hint);
+    });
+  });
+}
+
+// ============================================================
+// MUST KNOW AUTOPLAY
+// ============================================================
+let mkApActive = false, mkApIdx = 0, mkApTimer = null, mkApShuffle = false, mkApHint = true;
+
+function speakMkItem(term, hint) {
+  window.speechSynthesis.cancel();
+  const hasKo = /[가-힣]/.test(term);
+  const parts = term.split(/\s+/);
+  const enParts = parts.filter(p => !/[가-힣]/.test(p)).join(' ').replace(/[()]/g, '').trim();
+  const koParts = parts.filter(p => /[가-힣]/.test(p)).join(' ').trim();
+  if (hasKo && koParts) {
+    const u1 = new SpeechSynthesisUtterance(koParts);
+    u1.lang = 'ko-KR'; u1.rate = 0.85;
+    u1.onend = () => {
+      if (!enParts) return;
+      const u2 = new SpeechSynthesisUtterance(enParts);
+      u2.lang = 'en-US'; u2.rate = 0.82;
+      window.speechSynthesis.speak(u2);
+    };
+    window.speechSynthesis.speak(u1);
+  } else {
+    const u = new SpeechSynthesisUtterance(enParts || term);
+    u.lang = 'en-US'; u.rate = 0.82;
+    window.speechSynthesis.speak(u);
+  }
+}
+
+document.getElementById('mkApOptHint').addEventListener('click', function() {
+  mkApHint = !mkApHint;
+  this.textContent = mkApHint ? '힌트 포함' : '힌트 제외';
+  this.classList.toggle('active', mkApHint);
+});
+document.getElementById('mkApOptShuffle').addEventListener('click', function() {
+  mkApShuffle = !mkApShuffle;
+  this.textContent = mkApShuffle ? '셔플 켜짐' : '셔플 꺼짐';
+  this.classList.toggle('active', mkApShuffle);
+});
+
+function buildMkQueue() {
+  let allItems = [];
+  MUSTKNOW.forEach(cat => {
+    cat.items.forEach(item => {
+      allItems.push({ term: item.term, note: item.note, hint: item.hint, accent: cat.accent });
+    });
+  });
+  if (mkApShuffle) allItems = allItems.sort(() => Math.random() - 0.5);
+  return allItems;
+}
+
+let mkApQueue = [];
+
+function startMkAutoPlay() {
+  mkApQueue = buildMkQueue();
+  if (!mkApQueue.length) return;
+  mkApActive = true; mkApIdx = 0;
+  document.getElementById('mkAutoPlayBtn').textContent = '\u25a0 중지';
+  document.getElementById('mkAutoPlayBtn').classList.add('playing');
+  document.getElementById('mkAutoPlayBar').classList.add('visible');
+  playMkNext();
+}
+
+function stopMkAutoPlay() {
+  mkApActive = false;
+  if (mkApTimer) clearTimeout(mkApTimer);
+  window.speechSynthesis.cancel();
+  document.getElementById('mkAutoPlayBtn').textContent = '\u25b6 자동 읽기';
+  document.getElementById('mkAutoPlayBtn').classList.remove('playing');
+  document.getElementById('mkAutoPlayBar').classList.remove('visible');
+  document.querySelectorAll('.mk-card').forEach(c => c.style.outline = '');
+}
+
+function playMkNext() {
+  if (!mkApActive || mkApIdx >= mkApQueue.length) { stopMkAutoPlay(); return; }
+  const item = mkApQueue[mkApIdx];
+
+  // Update status bar
+  document.getElementById('mkApLabel').textContent = '필수암기';
+  document.getElementById('mkApKo').textContent = item.term;
+  document.getElementById('mkApEn').textContent = item.note.substring(0, 50) + (item.note.length > 50 ? '…' : '');
+  document.getElementById('mkApProgress').textContent = `${mkApIdx + 1} / ${mkApQueue.length}`;
+
+  // Highlight current card
+  document.querySelectorAll('.mk-card').forEach((c, i) => {
+    c.style.outline = i === mkApIdx ? '2px solid var(--accent)' : '';
+  });
+  const cards = document.querySelectorAll('.mk-card');
+  if (cards[mkApIdx]) cards[mkApIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  window.speechSynthesis.cancel();
+
+  // Parse term: separate Korean and English parts
+  const termParts = item.term.split(/\s+/);
+  const enTerm = termParts.filter(p => !/[가-힣]/.test(p)).join(' ').replace(/[()]/g,'').trim();
+  const koTerm = termParts.filter(p => /[가-힣]/.test(p)).join(' ').trim();
+
+  const utterances = [];
+
+  // 1. Korean term if exists
+  if (koTerm) {
+    const u = new SpeechSynthesisUtterance(koTerm);
+    u.lang = 'ko-KR'; u.rate = 0.85;
+    utterances.push(u);
+  }
+  // 2. English term
+  if (enTerm) {
+    const u = new SpeechSynthesisUtterance(enTerm);
+    u.lang = 'en-US'; u.rate = 0.82;
+    utterances.push(u);
+  }
+  // 3. Hint (Korean) if enabled
+  if (mkApHint && item.hint) {
+    const hintText = item.hint.replace(/['"]/g, '');
+    const u = new SpeechSynthesisUtterance(hintText);
+    u.lang = /[가-힣]/.test(hintText) ? 'ko-KR' : 'en-US';
+    u.rate = 0.8;
+    utterances.push(u);
+  }
+
+  // Chain utterances
+  function speakChain(idx) {
+    if (!mkApActive || idx >= utterances.length) {
+      if (!mkApActive) return;
+      mkApTimer = setTimeout(() => { mkApIdx++; playMkNext(); }, 1000);
+      return;
+    }
+    utterances[idx].onend = () => {
+      if (!mkApActive) return;
+      mkApTimer = setTimeout(() => speakChain(idx + 1), 300);
+    };
+    window.speechSynthesis.speak(utterances[idx]);
+  }
+  speakChain(0);
+}
+
+document.getElementById('mkAutoPlayBtn').addEventListener('click', () => {
+  if (mkApActive) stopMkAutoPlay(); else startMkAutoPlay();
+});
+document.getElementById('mkAutoPlayStop').addEventListener('click', stopMkAutoPlay);
+
+// ============================================================
+// SPECIALIST AUTOPLAY
+// ============================================================
+let specApActive = false, specApIdx = 0, specApTimer = null, specApShuffle = false;
+
+document.getElementById('specApOptShuffle').addEventListener('click', function() {
+  specApShuffle = !specApShuffle;
+  this.textContent = specApShuffle ? '셔플 켜짐' : '셔플 꺼짐';
+  this.classList.toggle('active', specApShuffle);
+});
+
+function buildSpecQueue() {
+  let list = [...SPECIALISTS];
+  if (specApShuffle) list = list.sort(() => Math.random() - 0.5);
+  // Each item: Korean name → English title → Korean description snippet
+  return list.map(s => ({ ko: s.ko, en: s.title, desc: s.desc.ko }));
+}
+
+let specApQueue = [];
+
+function startSpecAutoPlay() {
+  specApQueue = buildSpecQueue();
+  if (!specApQueue.length) return;
+  specApActive = true; specApIdx = 0;
+  document.getElementById('specAutoPlayBtn').textContent = '■ 중지';
+  document.getElementById('specAutoPlayBtn').classList.add('playing');
+  document.getElementById('specAutoPlayBar').classList.add('visible');
+  playSpecNext();
+}
+
+function stopSpecAutoPlay() {
+  specApActive = false;
+  if (specApTimer) clearTimeout(specApTimer);
+  window.speechSynthesis.cancel();
+  document.getElementById('specAutoPlayBtn').textContent = '▶ 자동 읽기';
+  document.getElementById('specAutoPlayBtn').classList.remove('playing');
+  document.getElementById('specAutoPlayBar').classList.remove('visible');
+  document.querySelectorAll('.specialist-card').forEach(c => c.style.outline = '');
+}
+
+function playSpecNext() {
+  if (!specApActive || specApIdx >= specApQueue.length) { stopSpecAutoPlay(); return; }
+  const item = specApQueue[specApIdx];
+  document.getElementById('specApLabel').textContent = '스페셜리스트';
+  document.getElementById('specApKo').textContent = item.ko;
+  document.getElementById('specApEn').textContent = item.en;
+  document.getElementById('specApProgress').textContent = `${specApIdx + 1} / ${specApQueue.length}`;
+
+  // Highlight card
+  const cards = document.querySelectorAll('.specialist-card');
+  cards.forEach((c, i) => { c.style.outline = i === specApIdx ? '2px solid var(--accent)' : ''; });
+  if (cards[specApIdx]) cards[specApIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  window.speechSynthesis.cancel();
+  // 1. Korean name
+  const u1 = new SpeechSynthesisUtterance(item.ko);
+  u1.lang = 'ko-KR'; u1.rate = 0.85;
+  u1.onend = () => {
+    if (!specApActive) return;
+    specApTimer = setTimeout(() => {
+      if (!specApActive) return;
+      // 2. English title
+      const u2 = new SpeechSynthesisUtterance(item.en);
+      u2.lang = 'en-US'; u2.rate = 0.82;
+      u2.onend = () => {
+        if (!specApActive) return;
+        specApTimer = setTimeout(() => { specApIdx++; playSpecNext(); }, 900);
+      };
+      window.speechSynthesis.speak(u2);
+    }, 350);
+  };
+  window.speechSynthesis.speak(u1);
+}
+
+document.getElementById('specAutoPlayBtn').addEventListener('click', () => {
+  if (specApActive) stopSpecAutoPlay(); else startSpecAutoPlay();
+});
+document.getElementById('specAutoPlayStop').addEventListener('click', stopSpecAutoPlay);
+
+// ============================================================
+// WARD AUTOPLAY
+// ============================================================
+let wardApActive = false, wardApIdx = 0, wardApTimer = null, wardApShuffle = false;
+
+document.getElementById('wardApOptShuffle').addEventListener('click', function() {
+  wardApShuffle = !wardApShuffle;
+  this.textContent = wardApShuffle ? '셔플 켜짐' : '셔플 꺼짐';
+  this.classList.toggle('active', wardApShuffle);
+});
+
+function buildWardQueue() {
+  let allItems = [];
+  WARDS.forEach(section => { allItems = allItems.concat(section.items); });
+  if (wardApShuffle) allItems = allItems.sort(() => Math.random() - 0.5);
+  return allItems.map(item => ({ ko: item.ko, en: item.en, abbr: item.abbr || '' }));
+}
+
+let wardApQueue = [];
+
+function startWardAutoPlay() {
+  wardApQueue = buildWardQueue();
+  if (!wardApQueue.length) return;
+  wardApActive = true; wardApIdx = 0;
+  document.getElementById('wardAutoPlayBtn').textContent = '■ 중지';
+  document.getElementById('wardAutoPlayBtn').classList.add('playing');
+  document.getElementById('wardAutoPlayBar').classList.add('visible');
+  playWardNext();
+}
+
+function stopWardAutoPlay() {
+  wardApActive = false;
+  if (wardApTimer) clearTimeout(wardApTimer);
+  window.speechSynthesis.cancel();
+  document.getElementById('wardAutoPlayBtn').textContent = '▶ 자동 읽기';
+  document.getElementById('wardAutoPlayBtn').classList.remove('playing');
+  document.getElementById('wardAutoPlayBar').classList.remove('visible');
+  document.querySelectorAll('.ward-card').forEach(c => c.style.outline = '');
+}
+
+function playWardNext() {
+  if (!wardApActive || wardApIdx >= wardApQueue.length) { stopWardAutoPlay(); return; }
+  const item = wardApQueue[wardApIdx];
+  document.getElementById('wardApLabel').textContent = item.abbr ? `병동 · ${item.abbr}` : '병동';
+  document.getElementById('wardApKo').textContent = item.ko;
+  document.getElementById('wardApEn').textContent = item.en;
+  document.getElementById('wardApProgress').textContent = `${wardApIdx + 1} / ${wardApQueue.length}`;
+
+  // Highlight card
+  const cards = document.querySelectorAll('.ward-card');
+  cards.forEach((c, i) => { c.style.outline = i === wardApIdx ? '2px solid var(--accent)' : ''; });
+  if (cards[wardApIdx]) cards[wardApIdx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+  window.speechSynthesis.cancel();
+  // 1. Korean name
+  const u1 = new SpeechSynthesisUtterance(item.ko);
+  u1.lang = 'ko-KR'; u1.rate = 0.85;
+  u1.onend = () => {
+    if (!wardApActive) return;
+    wardApTimer = setTimeout(() => {
+      if (!wardApActive) return;
+      // 2. English name
+      const u2 = new SpeechSynthesisUtterance(item.en);
+      u2.lang = 'en-US'; u2.rate = 0.82;
+      u2.onend = () => {
+        if (!wardApActive) return;
+        // 3. Abbr if exists
+        if (item.abbr) {
+          wardApTimer = setTimeout(() => {
+            if (!wardApActive) return;
+            const u3 = new SpeechSynthesisUtterance(item.abbr.replace(/\//g, ' '));
+            u3.lang = 'en-US'; u3.rate = 0.8;
+            u3.onend = () => {
+              if (!wardApActive) return;
+              wardApTimer = setTimeout(() => { wardApIdx++; playWardNext(); }, 800);
+            };
+            window.speechSynthesis.speak(u3);
+          }, 300);
+        } else {
+          wardApTimer = setTimeout(() => { wardApIdx++; playWardNext(); }, 900);
+        }
+      };
+      window.speechSynthesis.speak(u2);
+    }, 350);
+  };
+  window.speechSynthesis.speak(u1);
+}
+
+document.getElementById('wardAutoPlayBtn').addEventListener('click', () => {
+  if (wardApActive) stopWardAutoPlay(); else startWardAutoPlay();
+});
+document.getElementById('wardAutoPlayStop').addEventListener('click', stopWardAutoPlay);
+
+// ============================================================
+// PHOTO MODAL
+// ============================================================
+function openPhotoModal(src, title) {
+  document.getElementById('photoModalImg').src = src;
+  document.getElementById('photoModalTitle').textContent = title || '';
+  const modal = document.getElementById('photoModal');
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function closePhotoModal(e) {
+  // Close if clicked on overlay (not inner content) or close button
+  if (e && e.target !== document.getElementById('photoModal')) return;
+  document.getElementById('photoModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    document.getElementById('photoModal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+renderList();
+updatePhotoStat();
+// Pre-load photos in background
+loadPhotos();
+</script>
+<!-- PHOTO MODAL -->
+<div class="photo-modal-overlay" id="photoModal" style="display:none" onclick="closePhotoModal(event)">
+  <div class="photo-modal-inner">
+    <button class="photo-modal-close" onclick="closePhotoModal()">✕</button>
+    <img class="photo-modal-img" id="photoModalImg" src="" alt="">
+    <div class="photo-modal-title" id="photoModalTitle"></div>
+  </div>
+</div>
+</body>
+</html>
