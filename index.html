@@ -274,6 +274,7 @@ header {
 }
 .autoplay-options-row.visible { display: flex; }
 .ap-opt-label { font-size: 11px; color: var(--text-dim); font-family: "Space Mono", monospace; margin-right: 4px; }
+.ap-opt-btn.playing { background: var(--accent2); color: #fff; border-color: var(--accent2); }
 .ap-opt-btn {
   background: var(--surface2);
   border: 1px solid var(--border);
@@ -334,6 +335,7 @@ header {
   color: var(--text-muted);
   font-size: 13px;
   width: 28px; height: 28px;
+  transition: background 0.15s, color 0.15s;
   border-radius: 50%;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
@@ -606,6 +608,20 @@ header {
   transition: border-color 0.15s;
 }
 .photo-card:hover { border-color: var(--border2); }
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  opacity: 0.35;
+  transition: opacity 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+.star-btn:hover { opacity: 0.7; transform: scale(1.2); }
+.star-btn.starred { opacity: 1; }
+
 .photo-card-img {
   width: 100%;
   aspect-ratio: 4/3;
@@ -859,6 +875,20 @@ header {
   transition: background 0.12s;
 }
 .photo-modal-close:hover { background: rgba(255,255,255,0.3); }
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  opacity: 0.35;
+  transition: opacity 0.15s, transform 0.1s;
+  flex-shrink: 0;
+}
+.star-btn:hover { opacity: 0.7; transform: scale(1.2); }
+.star-btn.starred { opacity: 1; }
+
 .photo-card-img {
   cursor: zoom-in;
 }
@@ -917,12 +947,15 @@ header {
       <button class="filter-btn" data-filter="combining" id="filterCombining">결합형</button>
       <button class="filter-btn" data-filter="suffix" id="filterSuffix">접미사</button>
       <button class="filter-btn" data-filter="prefix" id="filterPrefix">접두사</button>
+      <button class="filter-btn" data-filter="starred" id="filterStarred">⭐ 별표</button>
     </div>
     <div class="controls-row" style="margin-top:-8px">
       <span style="font-size:11px;color:var(--text-dim);font-family:'Space Mono',monospace;">CH</span>
       <button class="ch-filter-btn active" data-chfilter="all" id="chAll">전체</button>
       <button class="ch-filter-btn" data-chfilter="1" id="ch1">Ch.1</button>
       <button class="ch-filter-btn" data-chfilter="2" id="ch2">Ch.2</button>
+      <button class="ch-filter-btn" data-chfilter="3" id="ch3">Ch.3</button>
+      <button class="ch-filter-btn" data-chfilter="4" id="ch4">Ch.4</button>
     </div>
     <div class="mode-bar">
       <span class="mode-label">MODE</span>
@@ -930,6 +963,8 @@ header {
       <button class="mode-btn" data-mode="flashcard" id="modeFlashcard">플래시카드</button>
       <button class="mode-btn" data-mode="quiz" id="modeQuiz">퀴즈</button>
       <button class="autoplay-btn" id="autoPlayBtn" title="한국어→영어 자동 읽기">▶ 자동 읽기</button>
+      <button class="ap-opt-btn" id="fcKoFirstBtn" title="한국어 먼저 보기" style="margin-left:auto">🇰🇷 한국어 먼저</button>
+      <button class="ap-opt-btn" id="accentBtn" title="발음 선택">🇺🇸 US</button>
     </div>
 
     <div class="autoplay-options-row" id="autoPlayOptionsRow">
@@ -962,6 +997,7 @@ header {
           <div class="fc-face fc-front">
             <span class="fc-type-tag tag-combining" id="fcTypeTag">결합형</span>
             <div class="fc-main-term" id="fcTerm">–</div>
+            <div class="fc-sub-term" id="fcSubTerm" style="font-size:14px;color:var(--text-muted);margin-top:6px"></div>
             <div class="fc-hint" id="fcHint">클릭해서 뒤집기</div>
           </div>
           <div class="fc-face fc-back">
@@ -969,8 +1005,9 @@ header {
             <div class="fc-answer-meaning" id="fcMeaning">–</div>
             <div class="fc-answer-pronun" id="fcPronun"></div>
             <div class="fc-examples" id="fcExamples"></div>
-            <div class="fc-speak-area">
+            <div class="fc-speak-area" style="display:flex;gap:8px;align-items:center;margin-top:16px">
               <button class="fc-speak-big" id="fcSpeakBtn">🔊 발음 듣기</button>
+              <button class="star-btn" id="fcStarBtn" style="font-size:20px;opacity:0.5" title="별표">☆</button>
             </div>
           </div>
         </div>
@@ -1366,7 +1403,223 @@ const DATA = [
     examples:[{en:'lateral malleolus',ko:'외측 복사뼈',es:'maléolo lateral'},{en:'bilateral',ko:'양측의',es:'bilateral'}]},
   { term:'medi/o → medial', type:'combining', ko:'중간/내측', en:'middle / medial', es:'medial', pronun:'미-디-알', chapter:2,
     examples:[{en:'medial meniscus',ko:'내측 반월판',es:'menisco medial'},{en:'medial malleolus',ko:'내측 복사뼈',es:'maléolo medial'}]},
-];
+
+  // ── CH.3 NOUN SUFFIXES ──
+  { term:'-algia', type:'suffix', ko:'통증', en:'pain', es:'dolor', pronun:'알-지-아', chapter:3,
+    examples:[{en:'arthralgia',ko:'관절통',es:'artralgia'},{en:'otalgia',ko:'귀 통증',es:'otalgia'},{en:'neuralgia',ko:'신경통',es:'neuralgia'},{en:'myalgia',ko:'근육통',es:'mialgia'}]},
+  { term:'-cele', type:'suffix', ko:'탈장/돌출', en:'hernia, protrusion', es:'hernia', pronun:'실-레', chapter:3,
+    examples:[{en:'rectocele',ko:'직장 탈장',es:'rectocele'},{en:'cystocele',ko:'방광 탈장',es:'cistocele'}]},
+  { term:'-centesis', type:'suffix', ko:'천자(액체 제거)', en:'puncture to remove fluid', es:'punción', pronun:'센-티-시스', chapter:3,
+    examples:[{en:'thoracentesis',ko:'흉강천자',es:'toracocentesis'},{en:'amniocentesis',ko:'양수천자',es:'amniocentesis'},{en:'abdominocentesis',ko:'복강천자',es:'abdominocentesis'}]},
+  { term:'-coccus / -cocci', type:'suffix', ko:'구형 세균', en:'berry-shaped bacterium', es:'coco/bacteria', pronun:'코-쿠스/코-카이', chapter:3,
+    examples:[{en:'streptococcus',ko:'연쇄구균',es:'estreptococo'},{en:'staphylococci',ko:'포도상구균',es:'estafilococos'}]},
+  { term:'-cyte', type:'suffix', ko:'세포', en:'cell', es:'célula', pronun:'사이트', chapter:3,
+    examples:[{en:'erythrocyte',ko:'적혈구',es:'eritrocito'},{en:'leukocyte',ko:'백혈구',es:'leucocito'},{en:'thrombocyte',ko:'혈소판',es:'trombocito'}]},
+  { term:'-dynia', type:'suffix', ko:'통증', en:'pain', es:'dolor', pronun:'디-니-아', chapter:3,
+    examples:[{en:'pleurodynia',ko:'흉막통증',es:'pleurodinia'}]},
+  { term:'-ectomy', type:'suffix', ko:'절제술', en:'excision, removal', es:'extirpación', pronun:'엑-토-미', chapter:3,
+    examples:[{en:'laryngectomy',ko:'후두절제술',es:'laringectomía'},{en:'mastectomy',ko:'유방절제술',es:'mastectomía'}]},
+  { term:'-emia', type:'suffix', ko:'혈액 상태', en:'blood condition', es:'condición de la sangre', pronun:'이-미-아', chapter:3,
+    examples:[{en:'anemia',ko:'빈혈',es:'anemia'},{en:'ischemia',ko:'허혈',es:'isquemia'},{en:'leukemia',ko:'백혈병',es:'leucemia'}]},
+  { term:'-genesis', type:'suffix', ko:'생성/형성 과정', en:'producing, forming', es:'génesis/formación', pronun:'제-네-시스', chapter:3,
+    examples:[{en:'carcinogenesis',ko:'발암 과정',es:'carcinogénesis'},{en:'pathogenesis',ko:'병인론',es:'patogénesis'},{en:'angiogenesis',ko:'혈관 신생',es:'angiogénesis'}]},
+  { term:'-gram', type:'suffix', ko:'기록/영상', en:'record, image', es:'registro/imagen', pronun:'그-램', chapter:3,
+    examples:[{en:'electroencephalogram',ko:'뇌전도',es:'electroencefalograma'},{en:'mammogram',ko:'유방 X선',es:'mamografía'}]},
+  { term:'-graph', type:'suffix', ko:'기록 기기', en:'instrument for recording', es:'instrumento de registro', pronun:'그-래프', chapter:3,
+    examples:[{en:'electroencephalograph',ko:'뇌전도 기기',es:'electroencefalógrafo'}]},
+  { term:'-graphy', type:'suffix', ko:'기록 과정', en:'process of recording', es:'proceso de registro', pronun:'그-라-피', chapter:3,
+    examples:[{en:'electroencephalography',ko:'뇌전도 검사',es:'electroencefalografía'},{en:'angiography',ko:'혈관 조영술',es:'angiografía'}]},
+  { term:'-itis', type:'suffix', ko:'염증', en:'inflammation', es:'inflamación', pronun:'아이-티스', chapter:3,
+    examples:[{en:'bronchitis',ko:'기관지염',es:'bronquitis'},{en:'myelitis',ko:'척수염',es:'mielitis'},{en:'tonsillitis',ko:'편도염',es:'amigdalitis'},{en:'thrombophlebitis',ko:'혈전정맥염',es:'tromboflebitis'}]},
+  { term:'-logy', type:'suffix', ko:'학문', en:'study of', es:'estudio de', pronun:'로-지', chapter:3,
+    examples:[{en:'ophthalmology',ko:'안과학',es:'oftalmología'},{en:'morphology',ko:'형태학',es:'morfología'}]},
+  { term:'-lysis', type:'suffix', ko:'분해/파괴', en:'breakdown, destruction', es:'lisis/destrucción', pronun:'리-시스', chapter:3,
+    examples:[{en:'hemolysis',ko:'용혈',es:'hemólisis'}]},
+  { term:'-malacia', type:'suffix', ko:'연화', en:'softening', es:'malacia/reblandecimiento', pronun:'말-레이-시-아', chapter:3,
+    examples:[{en:'osteomalacia',ko:'골연화증',es:'osteomalacia'},{en:'chondromalacia',ko:'연골 연화증',es:'condromalacia'}]},
+  { term:'-megaly', type:'suffix', ko:'비대/확대', en:'enlargement', es:'agrandamiento', pronun:'메-갈-리', chapter:3,
+    examples:[{en:'acromegaly',ko:'말단비대증',es:'acromegalia'},{en:'splenomegaly',ko:'비장비대',es:'esplenomegalia'},{en:'hepatomegaly',ko:'간비대',es:'hepatomegalia'}]},
+  { term:'-oma', type:'suffix', ko:'종양/혈종', en:'tumor, mass, collection of fluid', es:'tumor/masa', pronun:'오-마', chapter:3,
+    examples:[{en:'myoma',ko:'근종(양성)',es:'mioma'},{en:'myosarcoma',ko:'근육육종(악성)',es:'miosarcoma'},{en:'hematoma',ko:'혈종',es:'hematoma'},{en:'multiple myeloma',ko:'다발성 골수종',es:'mieloma múltiple'}]},
+  { term:'-opsy', type:'suffix', ko:'보다/검사', en:'to view, examine', es:'examen/biopsia', pronun:'옵-시', chapter:3,
+    examples:[{en:'biopsy',ko:'생검',es:'biopsia'},{en:'necropsy',ko:'부검(동물)',es:'necropsia'}]},
+  { term:'-osis', type:'suffix', ko:'비정상 상태', en:'condition (usually abnormal)', es:'condición anormal', pronun:'오-시스', chapter:3,
+    examples:[{en:'necrosis',ko:'괴사',es:'necrosis'},{en:'hydronephrosis',ko:'수신증',es:'hidronefrosis'},{en:'leukocytosis',ko:'백혈구 증가증',es:'leucocitosis'}]},
+  { term:'-pathy', type:'suffix', ko:'질환', en:'disease condition', es:'enfermedad', pronun:'파-씨', chapter:3,
+    examples:[{en:'cardiomyopathy',ko:'심근병증',es:'cardiomiopatía'},{en:'nephropathy',ko:'신장병',es:'nefropatía'}]},
+  { term:'-penia', type:'suffix', ko:'결핍', en:'deficiency', es:'deficiencia/penia', pronun:'피-니-아', chapter:3,
+    examples:[{en:'erythropenia',ko:'적혈구 감소증',es:'eritropenia'},{en:'neutropenia',ko:'호중구 감소증',es:'neutropenia'},{en:'thrombocytopenia',ko:'혈소판 감소증',es:'trombocitopenia'}]},
+  { term:'-phobia', type:'suffix', ko:'공포증', en:'fear', es:'fobia', pronun:'포-비-아', chapter:3,
+    examples:[{en:'acrophobia',ko:'고소공포증',es:'acrofobia'},{en:'agoraphobia',ko:'광장공포증',es:'agorafobia'}]},
+  { term:'-plasia', type:'suffix', ko:'발달/형성/성장', en:'development, formation, growth', es:'plasia/desarrollo', pronun:'플-레이-지-아', chapter:3,
+    examples:[{en:'achondroplasia',ko:'연골무형성증',es:'acondroplasia'},{en:'hyperplasia',ko:'과형성',es:'hiperplasia'},{en:'dysplasia',ko:'이형성증',es:'displasia'}]},
+  { term:'-plasty', type:'suffix', ko:'외과적 수복', en:'surgical repair', es:'plastia/cirugía reparadora', pronun:'플-라-스-티', chapter:3,
+    examples:[{en:'angioplasty',ko:'혈관성형술',es:'angioplastia'},{en:'rhinoplasty',ko:'코성형술',es:'rinoplastia'},{en:'mammoplasty',ko:'유방성형술',es:'mamoplastia'}]},
+  { term:'-ptosis', type:'suffix', ko:'하수/탈출', en:'drooping, falling, prolapse', es:'ptosis/caída', pronun:'토-시스', chapter:3,
+    examples:[{en:'blepharoptosis',ko:'안검하수',es:'blefaroptosis'},{en:'prolapse',ko:'탈출/탈수',es:'prolapso'}]},
+  { term:'-rrhea', type:'suffix', ko:'분비/유출', en:'flow, discharge', es:'flujo/descarga', pronun:'리-아', chapter:3,
+    examples:[{en:'rhinorrhea',ko:'콧물',es:'rinorrea'}]},
+  { term:'-sclerosis', type:'suffix', ko:'경화', en:'hardening', es:'esclerosis', pronun:'스클레-로-시스', chapter:3,
+    examples:[{en:'arteriosclerosis',ko:'동맥경화증',es:'arteriosclerosis'},{en:'atherosclerosis',ko:'죽상동맥경화증',es:'aterosclerosis'}]},
+  { term:'-scope', type:'suffix', ko:'시각 검사 기기', en:'instrument for visual examination', es:'endoscopio', pronun:'스코-프', chapter:3,
+    examples:[{en:'laparoscope',ko:'복강경',es:'laparoscopio'},{en:'endoscope',ko:'내시경',es:'endoscopio'}]},
+  { term:'-scopy', type:'suffix', ko:'시각 검사 과정', en:'process of visual examination', es:'endoscopía', pronun:'스코-피', chapter:3,
+    examples:[{en:'laparoscopy',ko:'복강경 검사',es:'laparoscopía'},{en:'arthroscopy',ko:'관절경 검사',es:'artroscopía'}]},
+  { term:'-stasis', type:'suffix', ko:'정지/조절', en:'controlling, stopping', es:'estasis/detención', pronun:'스-테이-시스', chapter:3,
+    examples:[{en:'metastasis',ko:'전이',es:'metástasis'},{en:'hemostasis',ko:'지혈',es:'hemostasia'}]},
+  { term:'-stomy', type:'suffix', ko:'개구술(외부 개구)', en:'opening to form a stoma', es:'ostomía/abertura', pronun:'스-토-미', chapter:3,
+    examples:[{en:'colostomy',ko:'결장루술',es:'colostomía'},{en:'tracheostomy',ko:'기관절개 개구술',es:'traqueostomía'}]},
+  { term:'-therapy', type:'suffix', ko:'치료', en:'treatment', es:'terapia/tratamiento', pronun:'쎄-라-피', chapter:3,
+    examples:[{en:'hydrotherapy',ko:'수치료',es:'hidroterapia'},{en:'chemotherapy',ko:'화학요법',es:'quimioterapia'},{en:'radiotherapy',ko:'방사선 치료',es:'radioterapia'}]},
+  { term:'-tomy', type:'suffix', ko:'절개', en:'incision, cutting into', es:'tomía/incisión', pronun:'토-미', chapter:3,
+    examples:[{en:'laparotomy',ko:'개복술',es:'laparotomía'},{en:'phlebotomy',ko:'정맥 절개술',es:'flebotomía'},{en:'tracheotomy',ko:'기관 절개술',es:'traqueotomía'}]},
+  { term:'-trophy', type:'suffix', ko:'발달/영양', en:'development, nourishment', es:'trofia/desarrollo', pronun:'트-로-피', chapter:3,
+    examples:[{en:'hypertrophy',ko:'비대',es:'hipertrofia'},{en:'atrophy',ko:'위축',es:'atrofia'},{en:'dystrophy',ko:'이영양증',es:'distrofia'}]},
+  // CH.3 ADJECTIVE SUFFIXES
+  { term:'-ac / -iac', type:'suffix', ko:'~에 관한', en:'pertaining to', es:'relativo a', pronun:'악/이-악', chapter:3,
+    examples:[{en:'cardiac',ko:'심장의',es:'cardíaco'}]},
+  { term:'-genic', type:'suffix', ko:'~생성/~유발', en:'pertaining to producing', es:'génico/que produce', pronun:'제-닉', chapter:3,
+    examples:[{en:'carcinogenic',ko:'발암성의',es:'carcinogénico'},{en:'osteogenic',ko:'골 형성의',es:'osteogénico'}]},
+  { term:'-oid', type:'suffix', ko:'~을 닮은', en:'resembling, derived from', es:'oide/parecido a', pronun:'오이드', chapter:3,
+    examples:[{en:'opioid',ko:'오피오이드',es:'opioide'},{en:'adenoids',ko:'아데노이드',es:'adenoides'}]},
+  // CH.3 COMBINING FORMS NEW
+  { term:'acr/o', type:'combining', ko:'말단/극단', en:'extremities, top, extreme point', es:'extremidades', pronun:'아-크로', chapter:3,
+    examples:[{en:'acromegaly',ko:'말단비대증',es:'acromegalia'},{en:'acrophobia',ko:'고소공포증',es:'acrofobia'}]},
+  { term:'amni/o', type:'combining', ko:'양막', en:'amnion (sac around embryo)', es:'amnios', pronun:'암-니-오', chapter:3,
+    examples:[{en:'amniocentesis',ko:'양수천자',es:'amniocentesis'},{en:'amniotic fluid',ko:'양수',es:'líquido amniótico'}]},
+  { term:'angi/o', type:'combining', ko:'혈관', en:'vessel (blood/lymph)', es:'vaso/angio', pronun:'안-지-오', chapter:3,
+    examples:[{en:'angiography',ko:'혈관 조영술',es:'angiografía'},{en:'angioplasty',ko:'혈관성형술',es:'angioplastia'},{en:'angiogenesis',ko:'혈관 신생',es:'angiogénesis'}]},
+  { term:'blephar/o', type:'combining', ko:'눈꺼풀', en:'eyelid', es:'párpado', pronun:'블-레-파-로', chapter:3,
+    examples:[{en:'blepharoptosis',ko:'안검하수',es:'blefaroptosis'},{en:'blepharoplasty',ko:'안검성형술',es:'blefaroplastia'}]},
+  { term:'bronch/o', type:'combining', ko:'기관지', en:'bronchial tubes', es:'bronquios', pronun:'브-론-코', chapter:3,
+    examples:[{en:'bronchitis',ko:'기관지염',es:'bronquitis'},{en:'bronchoscopy',ko:'기관지경 검사',es:'broncoscopía'}]},
+  { term:'carcin/o', type:'combining', ko:'암', en:'cancer', es:'cáncer', pronun:'카-르-시-노', chapter:3,
+    examples:[{en:'carcinogenesis',ko:'발암 과정',es:'carcinogénesis'},{en:'carcinogenic',ko:'발암성의',es:'carcinogénico'},{en:'carcinoma',ko:'암종',es:'carcinoma'}]},
+  { term:'erythr/o', type:'combining', ko:'적색/적혈구', en:'red', es:'rojo', pronun:'에-리-스로', chapter:3,
+    examples:[{en:'erythrocyte',ko:'적혈구',es:'eritrocito'},{en:'erythropenia',ko:'적혈구 감소증',es:'eritropenia'}]},
+  { term:'leuk/o', type:'combining', ko:'백색/백혈구', en:'white', es:'blanco', pronun:'루-코', chapter:3,
+    examples:[{en:'leukocyte',ko:'백혈구',es:'leucocito'},{en:'leukemia',ko:'백혈병',es:'leucemia'},{en:'leukocytosis',ko:'백혈구 증가증',es:'leucocitosis'}]},
+  { term:'lymph/o', type:'combining', ko:'림프', en:'lymph (clear fluid)', es:'linfa', pronun:'림-포', chapter:3,
+    examples:[{en:'lymphocyte',ko:'림프구',es:'linfocito'},{en:'lymphoma',ko:'림프종',es:'linfoma'}]},
+  { term:'mamm/o', type:'combining', ko:'유방', en:'breast', es:'mama', pronun:'마-모', chapter:3,
+    examples:[{en:'mammogram',ko:'유방 X선 촬영',es:'mamografía'},{en:'mammoplasty',ko:'유방성형술',es:'mamoplastia'}]},
+  { term:'mast/o', type:'combining', ko:'유방', en:'breast', es:'mama', pronun:'마-스토', chapter:3,
+    examples:[{en:'mastectomy',ko:'유방절제술',es:'mastectomía'},{en:'mastitis',ko:'유방염',es:'mastitis'}]},
+  { term:'morph/o', type:'combining', ko:'형태/모양', en:'shape, form', es:'forma/morfología', pronun:'모-르-포', chapter:3,
+    examples:[{en:'morphology',ko:'형태학',es:'morfología'},{en:'polymorphonuclear',ko:'다형핵',es:'polimorfonuclear'}]},
+  { term:'myel/o', type:'combining', ko:'척수/골수', en:'spinal cord; bone marrow', es:'médula espinal / médula ósea', pronun:'마이-엘-로', chapter:3,
+    examples:[{en:'myelitis',ko:'척수염',es:'mielitis'},{en:'multiple myeloma',ko:'다발성 골수종',es:'mieloma múltiple'}]},
+  { term:'necr/o', type:'combining', ko:'사망/괴사', en:'death of cells', es:'muerte/necrosis', pronun:'네-크로', chapter:3,
+    examples:[{en:'necrosis',ko:'괴사',es:'necrosis'},{en:'necrotic',ko:'괴사의',es:'necrótico'},{en:'necropsy',ko:'부검',es:'necropsia'}]},
+  { term:'phleb/o', type:'combining', ko:'정맥', en:'vein', es:'vena', pronun:'플-레-보', chapter:3,
+    examples:[{en:'phlebotomy',ko:'정맥 절개술',es:'flebotomía'},{en:'thrombophlebitis',ko:'혈전정맥염',es:'tromboflebitis'}]},
+  { term:'sarc/o', type:'combining', ko:'살/결합조직', en:'flesh, connective tissue', es:'carne', pronun:'사-르-코', chapter:3,
+    examples:[{en:'sarcoma',ko:'육종',es:'sarcoma'},{en:'myosarcoma',ko:'근육육종',es:'miosarcoma'}]},
+  { term:'splen/o', type:'combining', ko:'비장', en:'spleen', es:'bazo', pronun:'스-플-레-노', chapter:3,
+    examples:[{en:'splenomegaly',ko:'비장비대',es:'esplenomegalia'},{en:'splenectomy',ko:'비장절제술',es:'esplenectomía'}]},
+  { term:'staphyl/o', type:'combining', ko:'포도송이(세균)', en:'clusters (bacteria)', es:'racimo/estafilococo', pronun:'스-타-필-로', chapter:3,
+    examples:[{en:'staphylococci',ko:'포도상구균',es:'estafilococos'},{en:'staphylococcal infection',ko:'포도상구균 감염',es:'infección estafilocócica'}]},
+  { term:'strept/o', type:'combining', ko:'꼬인 사슬(세균)', en:'twisted chains (bacteria)', es:'cadenas/estreptococo', pronun:'스-트-렙-토', chapter:3,
+    examples:[{en:'streptococcus',ko:'연쇄구균',es:'estreptococo'},{en:'strep throat',ko:'연쇄구균 인두염',es:'faringitis estreptocócica'}]},
+  { term:'thromb/o', type:'combining', ko:'혈전', en:'clot', es:'trombo/coágulo', pronun:'쓰-롬-보', chapter:3,
+    examples:[{en:'thrombocyte',ko:'혈소판',es:'trombocito'},{en:'thrombophlebitis',ko:'혈전정맥염',es:'tromboflebitis'},{en:'thrombocytopenia',ko:'혈소판 감소증',es:'trombocitopenia'}]},
+  { term:'tonsill/o', type:'combining', ko:'편도', en:'tonsils', es:'amígdalas', pronun:'톤-실-로', chapter:3,
+    examples:[{en:'tonsillitis',ko:'편도염',es:'amigdalitis'},{en:'tonsillectomy',ko:'편도절제술',es:'amigdalectomía'}]},
+  // ── CH.4 PREFIXES ──
+  { term:'a- / an-', type:'prefix', ko:'없는/아닌', en:'no, not, without', es:'sin/no', pronun:'아/안', chapter:4,
+    examples:[{en:'apnea',ko:'무호흡',es:'apnea'},{en:'anoxia',ko:'무산소증',es:'anoxia'},{en:'anemia',ko:'빈혈',es:'anemia'}]},
+  { term:'ab-', type:'prefix', ko:'~에서 멀어지는', en:'away from', es:'alejarse de', pronun:'압', chapter:4,
+    examples:[{en:'abnormal',ko:'비정상',es:'anormal'},{en:'abductor',ko:'외전근',es:'abductor'}]},
+  { term:'ad-', type:'prefix', ko:'~를 향한', en:'toward', es:'hacia', pronun:'아드', chapter:4,
+    examples:[{en:'adductor',ko:'내전근',es:'aductor'},{en:'adrenal glands',ko:'부신',es:'glándulas suprarrenales'}]},
+  { term:'ana-', type:'prefix', ko:'위로/분리', en:'up, apart', es:'arriba/separación', pronun:'아-나', chapter:4,
+    examples:[{en:'anabolism',ko:'동화작용',es:'anabolismo'},{en:'analysis',ko:'분석',es:'análisis'}]},
+  { term:'ante-', type:'prefix', ko:'앞/이전', en:'before, forward', es:'antes/delante', pronun:'안-테', chapter:4,
+    examples:[{en:'antepartum',ko:'분만 전',es:'anteparto'},{en:'anteflexion',ko:'전굴',es:'anteflexión'}]},
+  { term:'anti-', type:'prefix', ko:'반대/대항', en:'against', es:'contra/anti', pronun:'안-티', chapter:4,
+    examples:[{en:'antibiotic',ko:'항생제',es:'antibiótico'},{en:'antibody',ko:'항체',es:'anticuerpo'},{en:'antigen',ko:'항원',es:'antígeno'},{en:'antitoxin',ko:'항독소',es:'antitoxina'}]},
+  { term:'auto-', type:'prefix', ko:'자기/자신', en:'self, own', es:'auto/propio', pronun:'오-토', chapter:4,
+    examples:[{en:'autoimmune disease',ko:'자가면역질환',es:'enfermedad autoinmune'}]},
+  { term:'bi-', type:'prefix', ko:'둘', en:'two', es:'dos/bi', pronun:'바이', chapter:4,
+    examples:[{en:'bifurcation',ko:'분기',es:'bifurcación'},{en:'bilateral',ko:'양측성',es:'bilateral'}]},
+  { term:'brady-', type:'prefix', ko:'느린', en:'slow', es:'lento/bradi', pronun:'브-레이-디', chapter:4,
+    examples:[{en:'bradycardia',ko:'서맥',es:'bradicardia'},{en:'bradypnea',ko:'서호흡',es:'bradipnea'}]},
+  { term:'cata-', type:'prefix', ko:'아래로', en:'down', es:'hacia abajo', pronun:'카-타', chapter:4,
+    examples:[{en:'catabolism',ko:'이화작용',es:'catabolismo'}]},
+  { term:'con-', type:'prefix', ko:'함께/같이', en:'with, together', es:'con/junto', pronun:'콘', chapter:4,
+    examples:[{en:'congenital anomaly',ko:'선천성 기형',es:'anomalía congénita'},{en:'connective tissue',ko:'결합조직',es:'tejido conjuntivo'}]},
+  { term:'contra-', type:'prefix', ko:'반대', en:'against, opposite', es:'contra/opuesto', pronun:'콘-트라', chapter:4,
+    examples:[{en:'contraindication',ko:'금기증',es:'contraindicación'},{en:'contralateral',ko:'반대측',es:'contralateral'}]},
+  { term:'de-', type:'prefix', ko:'아래로/결핍', en:'down, lack of', es:'des/falta de', pronun:'디', chapter:4,
+    examples:[{en:'dehydration',ko:'탈수',es:'deshidratación'}]},
+  { term:'dia-', type:'prefix', ko:'통과/완전히', en:'through, complete', es:'a través/completo', pronun:'다이-아', chapter:4,
+    examples:[{en:'diameter',ko:'직경',es:'diámetro'},{en:'diarrhea',ko:'설사',es:'diarrea'},{en:'dialysis',ko:'투석',es:'diálisis'}]},
+  { term:'dys-', type:'prefix', ko:'비정상/어려운', en:'abnormal, difficult, painful', es:'difícil/anormal', pronun:'디-스', chapter:4,
+    examples:[{en:'dyspnea',ko:'호흡곤란',es:'disnea'},{en:'dystrophy',ko:'이영양증',es:'distrofia'},{en:'dysplasia',ko:'이형성증',es:'displasia'}]},
+  { term:'ec- / ecto-', type:'prefix', ko:'밖/외부', en:'out, outside', es:'fuera/ectópico', pronun:'엑/엑-토', chapter:4,
+    examples:[{en:'ectopic pregnancy',ko:'자궁외 임신',es:'embarazo ectópico'}]},
+  { term:'endo-', type:'prefix', ko:'안/내부', en:'in, within', es:'dentro/endo', pronun:'엔-도', chapter:4,
+    examples:[{en:'endocardium',ko:'심내막',es:'endocardio'},{en:'endoscope',ko:'내시경',es:'endoscopio'},{en:'endotracheal',ko:'기관내',es:'endotraqueal'}]},
+  { term:'epi-', type:'prefix', ko:'위에/~위', en:'upon, on, above', es:'sobre/encima', pronun:'에-피', chapter:4,
+    examples:[{en:'epithelium',ko:'상피',es:'epitelio'},{en:'epinephrine',ko:'에피네프린',es:'epinefrina'}]},
+  { term:'eu-', type:'prefix', ko:'정상/좋은', en:'good, normal', es:'normal/bueno', pronun:'유', chapter:4,
+    examples:[{en:'euphoria',ko:'행복감',es:'euforia'},{en:'euthyroid',ko:'정상 갑상선',es:'eutiroideo'}]},
+  { term:'hemi-', type:'prefix', ko:'반', en:'half', es:'medio/hemi', pronun:'헤-미', chapter:4,
+    examples:[{en:'hemiglossectomy',ko:'반설절제술',es:'hemiglosectomía'}]},
+  { term:'hyper-', type:'prefix', ko:'과도한/높은', en:'excessive, above normal', es:'excesivo/hiper', pronun:'하이-퍼', chapter:4,
+    examples:[{en:'hyperglycemia',ko:'고혈당',es:'hiperglucemia'},{en:'hyperplasia',ko:'과형성',es:'hiperplasia'},{en:'hypertension',ko:'고혈압',es:'hipertensión'}]},
+  { term:'hypo-', type:'prefix', ko:'부족한/낮은', en:'deficient, under', es:'deficiente/hipo', pronun:'하이-포', chapter:4,
+    examples:[{en:'hypoglycemia',ko:'저혈당',es:'hipoglucemia'},{en:'hypodermic',ko:'피하의',es:'hipodérmico'}]},
+  { term:'in-', type:'prefix', ko:'아닌/안으로', en:'not; into, within', es:'no/dentro', pronun:'인', chapter:4,
+    examples:[{en:'insomniac',ko:'불면증 환자',es:'insomne'},{en:'incision',ko:'절개',es:'incisión'}]},
+  { term:'infra-', type:'prefix', ko:'아래/하부', en:'beneath, under', es:'debajo/infra', pronun:'인-프라', chapter:4,
+    examples:[{en:'infracostal',ko:'늑골하의',es:'infracostal'}]},
+  { term:'inter-', type:'prefix', ko:'사이', en:'between', es:'entre/inter', pronun:'인-터', chapter:4,
+    examples:[{en:'intercostal',ko:'늑간의',es:'intercostal'}]},
+  { term:'intra-', type:'prefix', ko:'내부/안으로', en:'in, within, into', es:'dentro/intra', pronun:'인-트라', chapter:4,
+    examples:[{en:'intravenous',ko:'정맥내',es:'intravenoso'}]},
+  { term:'macro-', type:'prefix', ko:'큰', en:'large', es:'grande/macro', pronun:'마-크로', chapter:4,
+    examples:[{en:'macrocephaly',ko:'대두증',es:'macrocefalia'}]},
+  { term:'mal-', type:'prefix', ko:'나쁜/불량', en:'bad', es:'malo/mal', pronun:'말', chapter:4,
+    examples:[{en:'malaise',ko:'권태감',es:'malestar'},{en:'malignant',ko:'악성',es:'maligno'}]},
+  { term:'meta-', type:'prefix', ko:'너머/변화', en:'beyond, change', es:'más allá/cambio', pronun:'메-타', chapter:4,
+    examples:[{en:'metastasis',ko:'전이',es:'metástasis'},{en:'metamorphosis',ko:'변태',es:'metamorfosis'},{en:'metacarpal',ko:'중수골',es:'metacarpiano'}]},
+  { term:'micro-', type:'prefix', ko:'작은', en:'small', es:'pequeño/micro', pronun:'마이-크로', chapter:4,
+    examples:[{en:'microscope',ko:'현미경',es:'microscopio'},{en:'microcephaly',ko:'소두증',es:'microcefalia'}]},
+  { term:'neo-', type:'prefix', ko:'새로운', en:'new', es:'nuevo/neo', pronun:'니-오', chapter:4,
+    examples:[{en:'neonatal',ko:'신생아',es:'neonatal'},{en:'neoplasm',ko:'신생물(종양)',es:'neoplasma'}]},
+  { term:'pan-', type:'prefix', ko:'모든', en:'all', es:'todo/pan', pronun:'판', chapter:4,
+    examples:[{en:'pancytopenia',ko:'범혈구 감소증',es:'pancitopenia'}]},
+  { term:'para-', type:'prefix', ko:'비정상/곁', en:'abnormal, beside, near', es:'anormal/cerca/para', pronun:'파-라', chapter:4,
+    examples:[{en:'paralysis',ko:'마비',es:'parálisis'},{en:'parathyroid glands',ko:'부갑상선',es:'glándulas paratiroides'}]},
+  { term:'per-', type:'prefix', ko:'통과하는', en:'through', es:'a través/per', pronun:'퍼', chapter:4,
+    examples:[{en:'percutaneous',ko:'경피의',es:'percutáneo'}]},
+  { term:'poly-', type:'prefix', ko:'많은', en:'many, much', es:'muchos/poli', pronun:'폴-리', chapter:4,
+    examples:[{en:'polymorphonuclear',ko:'다형핵',es:'polimorfonuclear'},{en:'polyneuritis',ko:'다발성 신경염',es:'polineuritis'}]},
+  { term:'post-', type:'prefix', ko:'이후/뒤', en:'after, behind', es:'después/post', pronun:'포-스트', chapter:4,
+    examples:[{en:'postmortem',ko:'사후',es:'post mortem'},{en:'postpartum',ko:'산후',es:'postparto'}]},
+  { term:'pre-', type:'prefix', ko:'이전/앞', en:'before, in front of', es:'antes/pre', pronun:'프리', chapter:4,
+    examples:[{en:'precancerous',ko:'전암성',es:'precanceroso'},{en:'prenatal',ko:'출생 전',es:'prenatal'}]},
+  { term:'pro-', type:'prefix', ko:'앞/전방', en:'before, forward', es:'antes/adelante', pronun:'프로', chapter:4,
+    examples:[{en:'prodrome',ko:'전구증상',es:'pródromo'},{en:'prolapse',ko:'탈출',es:'prolapso'}]},
+  { term:'re-', type:'prefix', ko:'다시/돌아오는', en:'back, again', es:'otra vez/de nuevo', pronun:'리', chapter:4,
+    examples:[{en:'relapse',ko:'재발',es:'recaída'},{en:'remission',ko:'관해',es:'remisión'}]},
+  { term:'retro-', type:'prefix', ko:'뒤/후방', en:'behind, backward', es:'detrás/retro', pronun:'레-트로', chapter:4,
+    examples:[{en:'retroperitoneal',ko:'후복막의',es:'retroperitoneal'},{en:'retroflexion',ko:'후굴',es:'retroflexión'}]},
+  { term:'sub-', type:'prefix', ko:'아래/하부', en:'under', es:'debajo/sub', pronun:'섭', chapter:4,
+    examples:[{en:'subcutaneous',ko:'피하의',es:'subcutáneo'}]},
+  { term:'supra-', type:'prefix', ko:'위/상부', en:'above, upper', es:'encima/supra', pronun:'수-프라', chapter:4,
+    examples:[{en:'suprapubic',ko:'치골 상부의',es:'suprapúbico'}]},
+  { term:'syn- / sym-', type:'prefix', ko:'함께/같이', en:'together, with', es:'junto/con', pronun:'신/심', chapter:4,
+    examples:[{en:'syndactyly',ko:'합지증',es:'sindactilia'},{en:'syndrome',ko:'증후군',es:'síndrome'},{en:'synthesis',ko:'합성',es:'síntesis'}]},
+  { term:'tachy-', type:'prefix', ko:'빠른', en:'fast', es:'rápido/taqui', pronun:'타-키', chapter:4,
+    examples:[{en:'tachypnea',ko:'빈호흡',es:'taquipnea'},{en:'tachycardia',ko:'빈맥',es:'taquicardia'}]},
+  { term:'trans-', type:'prefix', ko:'가로지르는', en:'across, through', es:'a través/trans', pronun:'트-랜스', chapter:4,
+    examples:[{en:'transfusion',ko:'수혈',es:'transfusión'},{en:'transurethral',ko:'경요도',es:'transuretral'}]},
+  { term:'ultra-', type:'prefix', ko:'초과/너머', en:'beyond, excess', es:'ultra/más allá', pronun:'울-트라', chapter:4,
+    examples:[{en:'ultrasonography',ko:'초음파 검사',es:'ultrasonografía'}]},
+  { term:'uni-', type:'prefix', ko:'하나', en:'one', es:'uno/uni', pronun:'유-니', chapter:4,
+    examples:[{en:'unilateral',ko:'단측성',es:'unilateral'}]},];
 
 // ============================================================
 // SPECIALISTS DATA
@@ -2043,9 +2296,26 @@ let currentMode = 'list';
 let fcDeck = [], fcIndex = 0, fcFlipped = false;
 let quizScore = 0, quizTotal = 0, quizAnswered = false, quizCorrectIdx = -1;
 
+// Starred terms (localStorage)
+let starredTerms = new Set(JSON.parse(localStorage.getItem('medterm_starred') || '[]'));
+function saveStarred() {
+  localStorage.setItem('medterm_starred', JSON.stringify([...starredTerms]));
+}
+function toggleStar(term) {
+  if (starredTerms.has(term)) starredTerms.delete(term);
+  else starredTerms.add(term);
+  saveStarred();
+  // Update all star buttons for this term
+  document.querySelectorAll(`.star-btn[data-term="${CSS.escape(term)}"]`).forEach(btn => {
+    btn.classList.toggle('starred', starredTerms.has(term));
+    btn.textContent = starredTerms.has(term) ? '⭐' : '☆';
+  });
+}
+
 function getFilteredData() {
   const q = document.getElementById('searchBox').value.toLowerCase();
   return DATA.filter(d => {
+    if (currentFilter === 'starred') return starredTerms.has(d.term);
     if (currentFilter !== 'all' && d.type !== currentFilter) return false;
     if (currentChapter !== 'all' && String(d.chapter) !== currentChapter) return false;
     if (!q) return true;
@@ -2077,7 +2347,7 @@ function renderList() {
       <div class="example-row">
         <span class="ex-term">${ex.en}</span>
         <span class="ex-meaning">${ex.ko}${LANG==='es'&&ex.es?' / '+ex.es:''}</span>
-        <button class="speak-btn" onclick="speak('${ex.en.replace(/'/g,"\\'")}')" title="발음 듣기">🔊</button>
+        <button class="speak-btn" onclick="speak('${ex.en.replace(/'/g,"\\'")}', this)" title="클릭=재생/정지">🔊</button>
       </div>`).join('');
     return `<div class="term-card" style="animation-delay:${(i%10)*25}ms">
       <div class="card-header">
@@ -2086,7 +2356,10 @@ function renderList() {
           <div class="card-term">${d.term}</div>
           <div class="card-pronun">${d.pronun}</div>
         </div>
-        <button class="speak-btn" onclick="speak('${d.term.replace(/[/,]/g,' ').replace(/'/g,"\\'")}')" title="발음 듣기" style="margin-left:auto">🔊</button>
+        <div style="display:flex;gap:4px;margin-left:auto;align-items:center">
+          <button class="star-btn ${starredTerms.has(d.term)?'starred':''}" data-term="${d.term}" onclick="toggleStar('${d.term.replace(/'/g,"\\'")}')" title="별표">${starredTerms.has(d.term)?'⭐':'☆'}</button>
+          <button class="speak-btn" onclick="speak('${d.term.replace(/[/,]/g,' ').replace(/'/g,"\\'")}', this)" title="클릭=재생/정지">🔊</button>
+        </div>
       </div>
       <div class="card-meaning">${meaning}<span style="color:var(--text-dim);font-size:12px;margin-left:8px">${secMeaning}</span></div>
       <div class="card-examples">${exHtml}</div>
@@ -2099,6 +2372,15 @@ function initFlashcard() {
   fcIndex = 0; fcFlipped = false;
   renderFlashcard();
 }
+let fcKoFirst = false;
+
+document.getElementById('fcKoFirstBtn').addEventListener('click', function() {
+  fcKoFirst = !fcKoFirst;
+  this.classList.toggle('active', fcKoFirst);
+  this.textContent = fcKoFirst ? '🇰🇷 한국어 먼저 ON' : '🇰🇷 한국어 먼저';
+  if (fcDeck.length) renderFlashcard();
+});
+
 function renderFlashcard() {
   if (!fcDeck.length) return;
   const d = fcDeck[fcIndex];
@@ -2108,9 +2390,20 @@ function renderFlashcard() {
   document.getElementById('fcTypeTag').textContent = tagLabel;
   document.getElementById('fcTypeTagBack').className = `fc-type-tag ${tagClass}`;
   document.getElementById('fcTypeTagBack').textContent = tagLabel;
-  document.getElementById('fcTerm').textContent = d.term;
-  document.getElementById('fcMeaning').textContent = getMeaningByLang(d);
-  document.getElementById('fcPronun').textContent = d.pronun;
+
+  // KO-FIRST mode: show Korean on front, English on back
+  if (fcKoFirst) {
+    document.getElementById('fcTerm').textContent = d.ko;
+    document.getElementById('fcSubTerm').textContent = d.pronun;
+    document.getElementById('fcMeaning').textContent = d.term;
+    document.getElementById('fcHint').textContent = '클릭 → 영어 보기';
+  } else {
+    document.getElementById('fcTerm').textContent = d.term;
+    document.getElementById('fcSubTerm').textContent = d.pronun;
+    document.getElementById('fcMeaning').textContent = getMeaningByLang(d);
+    document.getElementById('fcHint').textContent = t('flipHint');
+  }
+  document.getElementById('fcPronun').textContent = fcKoFirst ? d.term : d.pronun;
   document.getElementById('fcExamples').innerHTML = d.examples.map(ex =>
     `<div class="fc-ex-item"><div class="fc-ex-en">${ex.en}</div><div class="fc-ex-ko">${ex.ko}</div></div>`
   ).join('');
@@ -2119,6 +2412,15 @@ function renderFlashcard() {
   document.getElementById('fcProgressFill').style.width = pct + '%';
   document.getElementById('flashcardInner').classList.remove('flipped');
   fcFlipped = false;
+  // Update star button state
+  const starBtn = document.getElementById('fcStarBtn');
+  if (starBtn) {
+    const isStarred = starredTerms.has(d.term);
+    starBtn.textContent = isStarred ? '⭐' : '☆';
+    starBtn.classList.toggle('starred', isStarred);
+    starBtn.style.opacity = isStarred ? '1' : '0.4';
+    starBtn.onclick = () => { toggleStar(d.term); starBtn.textContent = starredTerms.has(d.term) ? '⭐' : '☆'; starBtn.style.opacity = starredTerms.has(d.term) ? '1' : '0.4'; };
+  }
 }
 function flipCard() {
   fcFlipped = !fcFlipped;
@@ -2131,8 +2433,8 @@ document.getElementById('fcNext').addEventListener('click', () => { if(fcIndex<f
 document.getElementById('fcShuffle').addEventListener('click', () => {
   fcDeck.sort(()=>Math.random()-0.5); fcIndex=0; renderFlashcard();
 });
-document.getElementById('fcSpeakBtn').addEventListener('click', () => {
-  if(fcDeck[fcIndex]) speak(fcDeck[fcIndex].term);
+document.getElementById('fcSpeakBtn').addEventListener('click', function() {
+  if(fcDeck[fcIndex]) speak(fcDeck[fcIndex].term, this);
 });
 
 function renderQuiz() {
@@ -2321,13 +2623,82 @@ document.querySelectorAll('.chapter-tab').forEach(btn => {
 // ============================================================
 // SPEECH
 // ============================================================
-function speak(text) {
+// ── SPEAK WITH REPEAT + ACCENT ──
+let speakRepeat = false;
+let speakAccent = 'us'; // 'us' | 'uk' | 'both'
+let speakRepeatTimer = null;
+let lastSpeakText = '';
+
+const ACCENT_LABELS = { us:'🇺🇸 US', uk:'🇬🇧 UK', both:'🔄 둘 다' };
+const ACCENT_LANGS  = { us:['en-US'], uk:['en-GB'], both:['en-US','en-GB'] };
+
+document.getElementById('accentBtn').addEventListener('click', function() {
+  const order = ['us','uk','both'];
+  speakAccent = order[(order.indexOf(speakAccent)+1) % 3];
+  this.textContent = ACCENT_LABELS[speakAccent];
+  this.classList.toggle('active', speakAccent !== 'us');
+});
+
+// Repeat toggle — click active speak btn again to stop
+let currentSpeakBtn = null;
+
+function speak(text, btn) {
   if (!window.speechSynthesis) return;
+
+  // If same btn clicked while playing → stop
+  if (currentSpeakBtn && currentSpeakBtn === btn && speakRepeat) {
+    stopSpeak();
+    return;
+  }
+
+  stopSpeak();
+  lastSpeakText = text;
+  currentSpeakBtn = btn || null;
+  if (btn) { btn.textContent = '⏹'; btn.style.background = 'var(--accent2)'; }
+
+  speakRepeat = true;
+  speakCycle(text, 0);
+}
+
+function speakCycle(text, pass) {
+  if (!speakRepeat) return;
+  const langs = ACCENT_LANGS[speakAccent];
+  const lang = langs[pass % langs.length];
+
   window.speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'en-US'; u.rate = 0.85;
+  const u = new SpeechSynthesisUtterance(text.replace(/[\/\-,]/g,' '));
+  u.lang = lang;
+  u.rate = 0.82;
+
+  // Show which accent is playing on btn
+  if (currentSpeakBtn) {
+    currentSpeakBtn.title = lang === 'en-US' ? '🇺🇸 재생 중 (클릭=정지)' : '🇬🇧 재생 중 (클릭=정지)';
+  }
+
+  u.onend = () => {
+    if (!speakRepeat) return;
+    const pause = speakAccent === 'both' && pass % 2 === 0 ? 600 : 1200;
+    speakRepeatTimer = setTimeout(() => speakCycle(text, pass + 1), pause);
+  };
   window.speechSynthesis.speak(u);
 }
+
+function stopSpeak() {
+  speakRepeat = false;
+  if (speakRepeatTimer) clearTimeout(speakRepeatTimer);
+  window.speechSynthesis.cancel();
+  if (currentSpeakBtn) {
+    currentSpeakBtn.textContent = '🔊';
+    currentSpeakBtn.style.background = '';
+    currentSpeakBtn.title = '발음 듣기';
+    currentSpeakBtn = null;
+  }
+}
+
+// Stop when switching mode/tab
+document.querySelectorAll('.mode-btn, .chapter-tab').forEach(b => {
+  b.addEventListener('click', stopSpeak);
+});
 
 document.addEventListener('keydown', e => {
   if (currentMode==='flashcard') {
@@ -2564,6 +2935,59 @@ const MUSTKNOW = [
       { term:'Deep 심부', note:'표면에서 먼', hint:'반대: Superficial' },
       { term:'Supine 앙와위', note:'등을 대고 누운 자세 (face up)', hint:'"Supine = on your Spine"' },
       { term:'Prone 복와위', note:'배를 대고 엎드린 자세 (face down)', hint:'반대: Supine' },
+    ]
+  },
+  {
+    category: '⭐ Ch.3 핵심 접미사 Key Suffixes',
+    color: 'rgba(192,57,43,0.08)',
+    border: 'rgba(192,57,43,0.28)',
+    accent: '#c0392b',
+    items: [
+      { term:'수술 접미사 4개', en:'Surgical Suffixes', note:'-ectomy(절제) · -plasty(수복) · -tomy(절개) · -stomy(개구)', hint:'tomy=자르기, stomy=영구 구멍 만들기 — 차이 암기 필수!' },
+      { term:'-tomy vs -stomy', en:'Incision vs Opening', note:'-tomy = 절개(laparotomy=개복) | -stomy = 영구 개구(colostomy=결장루)', hint:'stomy에 "s" → 영구Stoma 생각' },
+      { term:'-plasia vs -plasty', en:'Formation vs Repair', note:'-plasia = 세포 형성/발달(achondroplasia) | -plasty = 외과 수복(angioplasty)', hint:'plasty는 plastic surgery처럼 "수술"' },
+      { term:'hypertrophy vs hyperplasia', en:'Size vs Number', note:'hypertrophy = 세포 크기 증가(근육 발달) | hyperplasia = 세포 수 증가(종양)', hint:'trophy = nourishment(영양) → 크기 변화' },
+      { term:'metastasis 전이', en:'Spread of cancer', note:'meta(너머) + stasis(정지) — 암이 원발 부위 너머로 퍼짐', hint:'meta = beyond, stasis = stopping' },
+      { term:'hemostasis 지혈', en:'Stopping blood flow', note:'hemo(혈액) + stasis(정지) — 자연적/인위적 출혈 정지', hint:'hemostat = 수술실 지혈 클램프' },
+      { term:'-centesis 천자', en:'Puncture to remove fluid', note:'amniocentesis(양수), thoracentesis(흉강), abdominocentesis(복강)', hint:'centesis = 바늘로 찌르기' },
+      { term:'anemia 빈혈', en:'Reduction in RBCs or hemoglobin', note:'an(없는) + emia(혈액) — 철결핍, 겸상세포, 재생불량 빈혈', hint:'literally "no blood" but actually reduced RBCs' },
+      { term:'ischemia 허혈', en:'Holding back blood from tissue', note:'isch/o(억제) + emia — 혈전/혈관 좁아짐으로 산소 부족 → 조직 괴사 가능', hint:'TIA = transient ischemic attack = 미니 뇌졸중' },
+    ]
+  },
+  {
+    category: '⭐ Ch.3 혈액세포 Blood Cells',
+    color: 'rgba(220,80,60,0.08)',
+    border: 'rgba(220,80,60,0.28)',
+    accent: '#e05050',
+    items: [
+      { term:'Erythrocyte 적혈구 (RBC)', en:'Red blood cell', note:'골수에서 형성 · 핵 없음 · 헤모글로빈으로 산소 운반', hint:'erythr/o = red' },
+      { term:'Thrombocyte 혈소판', en:'Platelet — clotting cell', note:'골수에서 형성된 세포 조각 · 혈액 응고에 필수', hint:'thromb/o = clot' },
+      { term:'Leukocyte 백혈구 (WBC)', en:'White blood cell — 5 types', note:'granulocytes(3): Neutrophil·Eosinophil·Basophil | mononuclear(2): Lymphocyte·Monocyte', hint:'Never Let Monkeys Eat Bananas' },
+      { term:'Neutrophil 호중구', en:'Most common WBC (50-60%)', note:'식균작용(phagocytosis) — 세균 먹어 파괴 · 다형핵(poly)', hint:'Neutropenia = 항암 치료 부작용' },
+      { term:'Lymphocyte 림프구', en:'32% of WBC — antibody production', note:'B cell = 항체 생성 | T cell = 직접 파괴 · AIDS 시 T cell 감소', hint:'lymph/o = lymph' },
+      { term:'Monocyte 단핵구', en:'4% of WBC — largest nucleus', note:'→ 대식세포(macrophage)로 변해 세포 잔해 제거', hint:'mon/o = one (하나의 큰 핵)' },
+      { term:'Eosinophil 호산구', en:'~3% — elevated in allergies', note:'붉게 염색 · 알레르기(천식) 시 증가', hint:'eosin/o = rosy(분홍색)' },
+      { term:'Basophil 호염기구', en:'<1% — healing phase', note:'푸르게 염색 · 염증 치유 단계에 증가', hint:'bas/o = basic (염기성 염색)' },
+    ]
+  },
+  {
+    category: '⭐ Ch.4 핵심 접두사 Key Prefixes',
+    color: 'rgba(0,206,201,0.07)',
+    border: 'rgba(0,206,201,0.28)',
+    accent: '#00cec9',
+    items: [
+      { term:'hyper- vs hypo-', en:'Excessive vs Deficient', note:'hyper = 과도(hyperglycemia 고혈당) | hypo = 부족(hypoglycemia 저혈당)', hint:'hyper = 위로 넘침, hypo = 아래로 부족' },
+      { term:'ante- vs anti-', en:'Before vs Against', note:'ante = 앞/이전(antepartum 분만전) | anti = 대항(antibiotic 항생제)', hint:'발음 주의! an-tee vs an-tuh' },
+      { term:'intra- vs inter- vs infra-', en:'Within vs Between vs Under', note:'intra = 내부(intravenous) | inter = 사이(intercostal) | infra = 아래(infracostal)', hint:'inter = 중간에, infra = 아래에' },
+      { term:'pre- vs pro- vs ante-', en:'All mean "before"', note:'pre = 이전(prenatal) | pro = 앞/전방(prodrome) | ante = 앞(antepartum)', hint:'모두 "앞/이전" — 단어별로 암기' },
+      { term:'ab- vs ad-', en:'Away vs Toward', note:'ab = 멀어지는(abductor 외전근) | ad = 향하는(adductor 내전근)', hint:'abductor: b가 a에서 멀어짐 · adductor: d가 a를 향함' },
+      { term:'endo- vs exo-/ec-', en:'Within vs Outside', note:'endo = 내부(endoscope 내시경) | ec/exo = 외부(ectopic 이소성)', hint:'endoscope = 몸 안을 보는 기기' },
+      { term:'macro- vs micro-', en:'Large vs Small', note:'macrocephaly = 대두증 | microcephaly = 소두증(Zika 바이러스)', hint:'macro = 크게, micro = 미세하게' },
+      { term:'meta- 전이/변화', en:'Beyond, change', note:'metastasis(전이) | metamorphosis(변태) | metacarpal(중수골 — 손목 너머)', hint:'meta = beyond (넘어서)' },
+      { term:'syn-/sym- 함께', en:'Together, with', note:'syndrome(증후군) | synthesis(합성) | syndactyly(합지증)', hint:'sym-: b,m,p 앞에서 syn→sym (symptom 주의 p 빠뜨리지 말 것!)' },
+      { term:'neo- 새로운', en:'New', note:'neonatal(신생아 — 출생 28일) | neoplasm(신생물/종양 — 양성 or 악성)', hint:'neo = new' },
+      { term:'pan- 모든', en:'All', note:'pancytopenia = 범혈구감소증 (RBC·WBC·혈소판 모두 감소)', hint:'pandemic = pan(모든) + demos(사람들)' },
+      { term:'relapse vs remission', en:'Return vs Relief', note:'relapse = 재발(질환 재귀) | remission = 관해(증상 완화/호전)', hint:'remission = 치료 중 좋아지는 것, relapse = 다시 나빠지는 것' },
     ]
   },
   {
